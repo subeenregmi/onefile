@@ -117,6 +117,14 @@ def getAllFileData(con):
                 """).fetchall())
 
 
+def removeFile(con, filename):
+    con.execute(f"""
+        DELETE FROM Files
+        WHERE FileName = '{filename}'
+                """)
+    con.commit()
+
+
 def getUserPrivilege(con, username):
     return con.execute(f"""
         SELECT Type

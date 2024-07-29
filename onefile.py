@@ -4,7 +4,8 @@ from flask import (
 )
 from onefile_db import (
     setupDatabase, checkUser, setupTestUsers, initialiseFiles, getAllFileNames,
-    incrementDownloadCount, getUserPrivilege, getAllFileData, addFile
+    incrementDownloadCount, getUserPrivilege, getAllFileData, addFile,
+    removeFile
 )
 
 
@@ -64,6 +65,18 @@ def uploadFile():
     addFile(db_con, filename)
 
     return "The file has been successfully added"
+
+
+@app.route('/api/deleteFile', methods=["POST"])
+def deleteFile():
+    privilege = request.cookies.get("privilege")
+
+    if (privilege != "Admin" and privilege != "Uploader"):
+        return "You need to be an admin or an uploader to upload files"
+
+    filename = request.form["filename"]
+    removeFile(db_con, filename)
+    return "The File has been successfully deleted"
 
 
 @app.route("/api/filenames", methods=["GET"])
