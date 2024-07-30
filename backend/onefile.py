@@ -5,11 +5,13 @@ from flask import (
 from onefile_db import (
     setupDatabase, checkUser, setupTestUsers, initialiseFiles, getAllFileNames,
     incrementDownloadCount, getUserPrivilege, getAllFileData, addFile,
-    removeFile
+    removeFile, getUserID, addDownloadTransaction
 )
 
-
-app = Flask(__name__)
+app = Flask(__name__,
+            template_folder="../templates/",
+            static_folder="../static/",
+            )
 db_con = setupDatabase("onefile.db")
 
 
@@ -25,6 +27,8 @@ def login():
 
     if checkUser(db_con, username, password):
         userPrivilege = getUserPrivilege(db_con, username)
+        userID = getUserID(db_con, username)
+        print(userID)
 
         response = redirect(url_for('dashboard'))
         response.set_cookie("username", username)
@@ -49,6 +53,7 @@ def dashboard():
         case None:
             return redirect(url_for('home'))
         case _:
+
             return render_template("loginpage.html", username=username)
 
 
@@ -61,7 +66,7 @@ def uploadFile():
 
     filename = request.form["filename"]
     file = request.files["file"]
-    file.save(f"./shared_files/{filename}")
+    file.save(f"shared_files/{filename}")
     addFile(db_con, filename)
 
     return "The file has been successfully added"
@@ -90,6 +95,7 @@ def downloadFile(filename):
     response = make_response(send_from_directory("shared_files", filename))
     response.headers["Content-Disposition"] = "attachment"
     incrementDownloadCount(db_con, filename)
+
     print(
         db_con.execute("SELECT FileName, DownloadCount FROM Files;").fetchall()
     )

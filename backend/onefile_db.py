@@ -1,6 +1,5 @@
 import sqlite3
 
-
 def setupUserPrivileges(con):
     con.execute("""
         CREATE TABLE IF NOT EXISTS UserPrivileges (
@@ -37,9 +36,22 @@ def setupFileTable(con):
         CREATE TABLE IF NOT EXISTS Files (
             ID INTEGER PRIMARY KEY,
             FileName VARCHAR(255) NOT NULL,
-            DownloadCount INTEGER
+            DownloadCount INTEGER,
+            UploadDate DATE
         );
     """)
+
+
+def setupDownloadHistory(con):
+    con.execute("""
+        CREATE TABLE IF NOT EXISTS DownloadHistory (
+            UserID INTEGER NOT NULL,
+            FileID INTEGER NOT NULL,
+            Timestamp DATE,
+            FOREIGN KEY (UserID) REFERENCES Users (ID),
+            FOREIGN KEY (FileID) REFERENCES Files (ID)
+        );
+                """)
 
 
 def setupUserPermissionTable(con):
@@ -134,10 +146,26 @@ def getUserPrivilege(con, username):
     """).fetchall()[0][0]
 
 
+def addDownloadTransaction(con, userID, fileID):
+    con.execute(f"""
+        INSERT INTO DownloadHistory (UserID, FileID, Timestamp)
+        VALUES ('{userID}', '{fileID}', GETDATE())
+                """)
+
+
+def getUserID(con, username):
+    return con.execute(f"""
+        SELECT ID
+        FROM Users
+        WHERE Username = '{username}'
+                       """).fetchone()[0]
+
+
 def setupDatabase(name):
     con = sqlite3.connect(name, check_same_thread=False)
     setupUserPrivileges(con)
     setupFileTable(con)
     setupUserTable(con)
+    setupDownloadHistory(con)
     setupUserPermissionTable(con)
     return con
