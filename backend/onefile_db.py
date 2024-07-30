@@ -1,4 +1,6 @@
 import sqlite3
+from os import listdir
+
 
 def setupUserPrivileges(con):
     con.execute("""
@@ -92,23 +94,21 @@ def getAllFileNames(con):
 
 
 def initialiseFiles(con):
-    files = [
-        ("image1.jpeg", 0),
-        ("image2.jpeg", 0),
-        ("image3.jpg", 0),
-        ("images.zip", 0)
-    ]
+    files = listdir("shared_files/")
+    files = [(x, 0) for x in files]
+
     if (con.execute("SELECT * FROM Files;").fetchone() is None):
         con.executemany("""
-            INSERT INTO Files (FileName, DownloadCount) VALUES (?, ?)
+            INSERT INTO Files (FileName, DownloadCount, UploadDate)
+            VALUES (?, ?, DATETIME('now'))
         """, files)
         con.commit()
 
 
 def addFile(con, filename):
     con.execute(f"""
-        INSERT INTO Files (FileName, DownloadCount)
-        VALUES ('{filename}', 0);
+        INSERT INTO Files (FileName, DownloadCount, UploadDate)
+        VALUES ('{filename}', 0, DATETIME('now'));
                 """)
     con.commit()
 
@@ -149,7 +149,7 @@ def getUserPrivilege(con, username):
 def addDownloadTransaction(con, userID, fileID):
     con.execute(f"""
         INSERT INTO DownloadHistory (UserID, FileID, Timestamp)
-        VALUES ('{userID}', '{fileID}', GETDATE())
+        VALUES ('{userID}', '{fileID}', DATETIME('now'))
                 """)
 
 
@@ -159,6 +159,24 @@ def getUserID(con, username):
         FROM Users
         WHERE Username = '{username}'
                        """).fetchone()[0]
+
+
+def getFileID(con, filename):
+    return con.execute(f"""
+        SELECT ID
+        FROM Files
+        WHERE FileName = '{filename}'
+                """).fetchone()[0]
+
+
+def getFileStatistics(con, filename):
+    fileID = getFileID(con, filename)
+    return con.execute(f"""
+        SELECT Username, Timestamp
+        FROM DownloadHistory INNER JOIN Users
+        ON DownloadHistory.UserID = Users.ID
+        WHERE FileID = {fileID}
+                      """).fetchall()
 
 
 def setupDatabase(name):

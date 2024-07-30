@@ -5,13 +5,13 @@ from flask import (
 from onefile_db import (
     setupDatabase, checkUser, setupTestUsers, initialiseFiles, getAllFileNames,
     incrementDownloadCount, getUserPrivilege, getAllFileData, addFile,
-    removeFile, getUserID, addDownloadTransaction
+    removeFile, getUserID, addDownloadTransaction, getFileID, getFileStatistics
 )
+
 
 app = Flask(__name__,
             template_folder="../templates/",
-            static_folder="../static/",
-            )
+            static_folder="../static/")
 db_con = setupDatabase("onefile.db")
 
 
@@ -28,11 +28,11 @@ def login():
     if checkUser(db_con, username, password):
         userPrivilege = getUserPrivilege(db_con, username)
         userID = getUserID(db_con, username)
-        print(userID)
 
         response = redirect(url_for('dashboard'))
         response.set_cookie("username", username)
         response.set_cookie("privilege", userPrivilege)
+        response.set_cookie("user_id", str(userID))
 
         return response
 
@@ -53,7 +53,6 @@ def dashboard():
         case None:
             return redirect(url_for('home'))
         case _:
-
             return render_template("loginpage.html", username=username)
 
 
@@ -92,13 +91,12 @@ def getFileNames():
 
 @app.route("/api/download/<filename>", methods=["GET"])
 def downloadFile(filename):
-    response = make_response(send_from_directory("shared_files", filename))
+    response = make_response(send_from_directory("../shared_files", filename))
     response.headers["Content-Disposition"] = "attachment"
+    fileID = getFileID(db_con, filename)
+    userID = request.cookies.get("user_id")
+    addDownloadTransaction(db_con, userID, fileID)
     incrementDownloadCount(db_con, filename)
-
-    print(
-        db_con.execute("SELECT FileName, DownloadCount FROM Files;").fetchall()
-    )
     return response
 
 
@@ -107,10 +105,16 @@ def allFileData():
     return getAllFileData(db_con)
 
 
+@app.route("/api/stats", methods=["POST"])
+def getFileStats():
+    return getFileStatistics(db_con, request.form['filename'])
+
+
 if __name__ == "__main__":
     app.debug = True
     # print(db_con.execute("SELECT * FROM sqlite_master").fetchall())
     setupTestUsers(db_con)
     initialiseFiles(db_con)
     print(getAllFileData(db_con))
+    print(getFileStatistics(db_con, "image2.jpeg"))
     app.run()
