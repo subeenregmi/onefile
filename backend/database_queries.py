@@ -183,6 +183,14 @@ def createUser(
     passhash: str,
     privilege: int
 ):
+    """ Creates a new user into the database
+
+    Args:
+        conn: A sqlite3 connection object connected to the database
+        username: The username of the new user
+        passhash: The bcrypted hashed password
+        privilege: The privilege level of the new user
+    """
     conn.execute(f"""
         INSERT INTO Users (Username, PassHash, Privilege)
         VALUES ('{username}', '{passhash}', {privilege})
