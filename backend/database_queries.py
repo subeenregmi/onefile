@@ -145,11 +145,34 @@ def removeFile(conn: sqlite3.Connection, filename: str):
         filename: The name of file to be deleted
 
     Returns: None
-
     """
+
     conn.execute(f"""
         DELETE FROM Files
         WHERE FileName = '{filename}'
+    """)
+    conn.commit()
+
+
+def removeFileHistory(conn: sqlite3.Connection, filename: str):
+    """ Removes the files download history.
+
+    This is used to allow for user and file to be deleted.
+
+    Args:
+        conn: A sqlite3 connection object connected to the database
+        filename: References to the file
+
+    Returns:
+        None
+    """
+
+    fileData = getFileData(conn, filename, "ID")[0]
+    fileID = fileData['ID']
+
+    conn.execute(f"""
+        DELETE FROM DownloadHistory
+        WHERE FileID = {fileID}
     """)
     conn.commit()
 
@@ -191,7 +214,7 @@ def createUser(
         passhash: The bcrypted hashed password
         privilege: The privilege level of the new user
 
-    Returns: 
+    Returns:
         None
     """
     conn.execute(f"""

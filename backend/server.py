@@ -4,7 +4,8 @@ from flask import (
 )
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
-    incrementDownloadCount, getFileStatistics, createUser, removeUser
+    incrementDownloadCount, getFileStatistics, createUser, removeUser,
+    removeFileHistory
 )
 from database_utils import (
     setupDatabase
@@ -103,6 +104,7 @@ def deleteFile():
         return "You need to be an admin or an uploader to upload files"
 
     filename = request.form["filename"]
+    removeFileHistory(db_conn, filename)
     removeFile(db_conn, filename)
     return "The file has been successfully deleted"
 

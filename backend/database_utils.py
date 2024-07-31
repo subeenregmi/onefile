@@ -1,6 +1,7 @@
 import sqlite3
 import database_tables
 from os import listdir
+from bcrypt import hashpw, gensalt
 
 
 def initUserPrivileges(conn: sqlite3.Connection):
@@ -34,9 +35,11 @@ def createTestUsers(conn: sqlite3.Connection):
         None
     """
     testUsers = [
-        ("Subeen", "123", "1"),
-        ("John", "456", "3"),
-        ("Adam", "789", "3")
+        (
+            "root",
+            f"{hashpw("root".encode("UTF-8"), gensalt()).decode("UTF-8")}",
+            "1"
+        )
     ]
     if (conn.execute("SELECT * FROM Users").fetchone() is None):
         conn.executemany("""
@@ -77,6 +80,9 @@ def setupDatabase(name: str) -> sqlite3.Connection:
         A connection to the database
     """
     conn = sqlite3.connect(name, check_same_thread=False)
+
+    conn.execute("PRAGMA foreign_keys = ON;")
+
     database_tables.createUserPrivilegesTable(conn)
     initUserPrivileges(conn)
 
@@ -84,7 +90,7 @@ def setupDatabase(name: str) -> sqlite3.Connection:
     initFiles(conn)
 
     database_tables.createUserTable(conn)
-    # createTestUsers(conn)
+    createTestUsers(conn)
 
     database_tables.createDownloadHistoryTable(conn)
     return conn
