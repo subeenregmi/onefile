@@ -30,5 +30,19 @@
             <input type="text" id="filename" name="filename">
             <input type="submit" value="Submit">
         </form>
+        <h3> Create new user </h3>
+        <form action="{{url_for('addUser')}}" method="post">
+            <label for="username"> Username: </label>
+            <input type="text" id="username" name="username"><br>
+            <label for="passhash"> Password: </label>
+            <input type="password" id="passhash" name="passhash"><br>
+            <label for="priv"> Privilege: </label>
+            <select id="priv" name="privilege">
+                <option value="1">Admin</option>
+                <option value="2">Uploader</option>
+                <option value="3">Viewer</option>
+            </select><br>
+            <input type="submit" value="Submit">
+        </form>
     </body>
 </html>

@@ -175,3 +175,16 @@ def addDownloadTransaction(
         VALUES ('{userID}', '{fileID}', DATETIME('now'))
     """)
     conn.commit()
+
+
+def createUser(
+    conn: sqlite3.Connection,
+    username: str,
+    passhash: str,
+    privilege: int
+):
+    conn.execute(f"""
+        INSERT INTO Users (Username, PassHash, Privilege)
+        VALUES ('{username}', '{passhash}', {privilege})
+    """)
+    conn.commit()

@@ -4,7 +4,7 @@ from flask import (
 )
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
-    incrementDownloadCount, getFileStatistics
+    incrementDownloadCount, getFileStatistics, createUser
 )
 from database_utils import (
     setupDatabase
@@ -14,7 +14,7 @@ from database_utils import (
 app = Flask(__name__,
             template_folder="../templates/",
             static_folder="../static/")
-db_con = setupDatabase("onefile.db")
+db_conn = setupDatabase("onefile.db")
 
 
 @app.route("/")
@@ -27,7 +27,7 @@ def login():
     username = request.form['username']
     passhash = request.form['password']
 
-    user = getUserData(db_con, username, passhash)
+    user = getUserData(db_conn, username, passhash)
 
     if user:
         user = user[0]
@@ -67,7 +67,7 @@ def uploadFile():
     filename = request.form["filename"]
     file = request.files["file"]
     file.save(f"shared_files/{filename}")
-    addFile(db_con, filename)
+    addFile(db_conn, filename)
 
     return "The file has been successfully added"
 
@@ -80,8 +80,8 @@ def deleteFile():
         return "You need to be an admin or an uploader to upload files"
 
     filename = request.form["filename"]
-    removeFile(db_con, filename)
-    return "The File has been successfully deleted"
+    removeFile(db_conn, filename)
+    return "The file has been successfully deleted"
 
 
 @app.route("/api/file/<filename>", methods=["GET"])
@@ -90,23 +90,42 @@ def getFile(filename):
     if filename == "all":
         filename = ""
 
-    return getFileData(db_con, filename, *columns)
+    return getFileData(db_conn, filename, *columns)
 
 
 @app.route("/api/download/<filename>", methods=["GET"])
 def downloadFile(filename):
+
     response = make_response(send_from_directory("../shared_files", filename))
     response.headers["Content-Disposition"] = "attachment"
-    file = getFileData(db_con, filename)
+
+    file = getFileData(db_conn, filename)
     userID = request.cookies.get("user_id")
-    addDownloadTransaction(db_con, userID, file[0]['ID'])
-    incrementDownloadCount(db_con, filename)
+
+    addDownloadTransaction(db_conn, userID, file[0]['ID'])
+    incrementDownloadCount(db_conn, filename)
+
     return response
 
 
-@app.route("/api/stats", methods=["POST"])
+@app.route("/api/file/stats", methods=["POST"])
 def getFileStats():
-    return getFileStatistics(db_con, request.form['filename'])
+    return getFileStatistics(db_conn, request.form['filename'])
+
+
+@app.route("/api/user/create", methods=["POST"])
+def addUser():
+    privilege = request.cookies.get("privilege")
+
+    if (privilege != "1"):
+        return "You need to be an admin to create new users"
+
+    newUsername = request.form["username"]
+    newPassHash = request.form["passhash"]
+    newPrivilege = request.form["privilege"]
+
+    createUser(db_conn, newUsername, newPassHash, newPrivilege)
+    return "The new user has been created"
 
 
 if __name__ == "__main__":
