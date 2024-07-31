@@ -1,6 +1,6 @@
 from flask import (
     Flask, render_template, request, send_from_directory, make_response,
-    redirect, url_for
+    redirect, url_for, session
 )
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
@@ -16,6 +16,10 @@ from bcrypt import hashpw, checkpw, gensalt
 app = Flask(__name__,
             template_folder="../templates/",
             static_folder="../static/")
+app.secret_key = (
+    "7e6dac2a942ba1d025171d1d7d9b9719e003a6c85f599d8a1b0c2fa7d8899af1"
+)
+
 db_conn = setupDatabase("onefile.db")
 
 
@@ -41,26 +45,22 @@ def login():
 
     user = user[0]
 
-    # TODO : Delete all accounts
-    if user['Username'] != "Subeen":
-        if not checkpw(password, user['PassHash'].encode("UTF-8")):
-            return render_template("homepage.html")
+    if not checkpw(password, user['PassHash'].encode("UTF-8")):
+        return render_template("homepage.html")
 
-    # Some user data is stored in cookies, possibly insecure
-    response = redirect(url_for('dashboard'))
-    response.set_cookie("username", user['Username'])
-    response.set_cookie("privilege", str(user['Privilege']))
-    response.set_cookie("user_id", str(user["ID"]))
+    session["username"] = user['Username']
+    session["privilege"] = str(user['Privilege'])
+    session["user_id"] = str(user["ID"])
 
-    return response
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/dashboard")
 def dashboard():
     """ This is the page for whom who successfully login. """
 
-    username = request.cookies.get("username")
-    privilege = request.cookies.get("privilege")
+    username = session.get("username")
+    privilege = session.get("privilege")
 
     match privilege:
         case "1":
@@ -79,7 +79,7 @@ def uploadFile():
     form data.
     """
 
-    privilege = request.cookies.get("privilege")
+    privilege = session.get("privilege")
 
     if (privilege != "1" and privilege != "2"):
         return "You need to be an admin or an uploader to upload files"
@@ -98,7 +98,7 @@ def deleteFile():
     form data.
     """
 
-    privilege = request.cookies.get("privilege")
+    privilege = session.get("privilege")
 
     if (privilege != "1" and privilege != "2"):
         return "You need to be an admin or an uploader to upload files"
@@ -129,7 +129,7 @@ def downloadFile(filename: str):
     response.headers["Content-Disposition"] = "attachment"
 
     file = getFileData(db_conn, filename)
-    userID = request.cookies.get("user_id")
+    userID = session.get("user_id")
 
     addDownloadTransaction(db_conn, userID, file[0]['ID'])
     incrementDownloadCount(db_conn, filename)
@@ -146,7 +146,7 @@ def getFileStats():
 @app.route("/api/user/create", methods=["POST"])
 def addUser():
     """ Api route to create a new user, admins can only create new users """
-    privilege = request.cookies.get("privilege")
+    privilege = session.get("privilege")
 
     if (privilege != "1"):
         return "You need to be an admin to create new users"
@@ -164,7 +164,7 @@ def addUser():
 def deleteUser():
     """ Api route to delete a user from the database """
 
-    privilege = request.cookies.get("privilege")
+    privilege = session.get("privilege")
 
     if (privilege != "1"):
         return "You need to be admin to remove new users"

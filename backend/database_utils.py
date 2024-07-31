@@ -82,6 +82,7 @@ def setupDatabase(name: str) -> sqlite3.Connection:
     conn = sqlite3.connect(name, check_same_thread=False)
 
     conn.execute("PRAGMA foreign_keys = ON;")
+    conn.commit()
 
     database_tables.createUserPrivilegesTable(conn)
     initUserPrivileges(conn)
