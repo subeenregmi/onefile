@@ -1,6 +1,6 @@
 function displayFileStats() {
     let container = document.getElementById("files")
-    fetch ("http://localhost:5000/api/file/all")
+    fetch ("http://localhost:5000/api/file/all?cols=FileName&cols=DownloadCount")
         .then (response => {
             if (response.ok) {
                 return response.json();
@@ -10,9 +10,12 @@ function displayFileStats() {
             }
         })
         .then (data => {
-            for (let key in data) {
+            console.log(data);
+            console.log(data[0]);
+            for (let file in data) {
                 let paragraph = document.createElement("p");
-                paragraph.innerText = key + ": " + data[key];
+                paragraph.innerText = data[file]['FileName'] + ": " 
+                    + data[file]['DownloadCount'];
                 container.appendChild(paragraph);
             }
         })

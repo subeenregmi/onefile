@@ -1,6 +1,6 @@
 function createDownloadLinks() {
     let container = document.getElementById("files");
-    fetch('http://localhost:5000/api/filenames')
+    fetch('http://localhost:5000/api/file/all?cols=FileName')
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -11,10 +11,10 @@ function createDownloadLinks() {
         })
         .then(data => {
             for(let x=0; x<data.length; x++){
-                let fileName = data[x];
+                let file = data[x];
                 let fileAnchor = document.createElement('a');
-                fileAnchor.href = (`/api/download/${fileName}`);
-                fileAnchor.innerHTML = fileName;
+                fileAnchor.href = (`/api/download/${file['FileName']}`);
+                fileAnchor.innerHTML = file['FileName'];
                 container.appendChild(fileAnchor);
             }
         })

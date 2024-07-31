@@ -2,10 +2,12 @@ from flask import (
     Flask, render_template, request, send_from_directory, make_response,
     redirect, url_for
 )
-from onefile_db import (
-    setupDatabase, checkUser, setupTestUsers, initialiseFiles, getAllFileNames,
-    incrementDownloadCount, getUserPrivilege, getAllFileData, addFile,
-    removeFile, getUserID, addDownloadTransaction, getFileID, getFileStatistics
+from database_queries import (
+    getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
+    incrementDownloadCount, getFileStatistics
+)
+from database_utils import (
+    setupDatabase
 )
 
 
@@ -23,16 +25,16 @@ def home():
 @app.route("/login", methods=["POST"])
 def login():
     username = request.form['username']
-    password = request.form['password']
+    passhash = request.form['password']
 
-    if checkUser(db_con, username, password):
-        userPrivilege = getUserPrivilege(db_con, username)
-        userID = getUserID(db_con, username)
+    user = getUserData(db_con, username, passhash)
 
+    if user:
+        user = user[0]
         response = redirect(url_for('dashboard'))
-        response.set_cookie("username", username)
-        response.set_cookie("privilege", userPrivilege)
-        response.set_cookie("user_id", str(userID))
+        response.set_cookie("username", user['Username'])
+        response.set_cookie("privilege", str(user['Privilege']))
+        response.set_cookie("user_id", str(user["ID"]))
 
         return response
 
@@ -43,24 +45,23 @@ def login():
 def dashboard():
     username = request.cookies.get("username")
     privilege = request.cookies.get("privilege")
-    print(privilege)
 
     match privilege:
-        case "Admin":
+        case "1":
             return render_template("adminpage.html")
-        case "Uploader":
+        case "2":
             return render_template("uploadpage.html")
-        case None:
-            return redirect(url_for('home'))
-        case _:
+        case "3":
             return render_template("loginpage.html", username=username)
+        case _:
+            return redirect(url_for('home'))
 
 
-@app.route('/api/uploadFile', methods=["POST"])
+@app.route('/api/file/upload', methods=["POST"])
 def uploadFile():
     privilege = request.cookies.get("privilege")
 
-    if (privilege != "Admin" and privilege != "Uploader"):
+    if (privilege != "1" and privilege != "2"):
         return "You need to be an admin or an uploader to upload files"
 
     filename = request.form["filename"]
@@ -71,11 +72,11 @@ def uploadFile():
     return "The file has been successfully added"
 
 
-@app.route('/api/deleteFile', methods=["POST"])
+@app.route('/api/file/delete', methods=["POST"])
 def deleteFile():
     privilege = request.cookies.get("privilege")
 
-    if (privilege != "Admin" and privilege != "Uploader"):
+    if (privilege != "1" and privilege != "2"):
         return "You need to be an admin or an uploader to upload files"
 
     filename = request.form["filename"]
@@ -83,26 +84,24 @@ def deleteFile():
     return "The File has been successfully deleted"
 
 
-@app.route("/api/filenames", methods=["GET"])
-def getFileNames():
-    fileNames = getAllFileNames(db_con)
-    return [x[0] for x in fileNames]
+@app.route("/api/file/<filename>", methods=["GET"])
+def getFile(filename):
+    columns = request.args.to_dict(flat=False)['cols']
+    if filename == "all":
+        filename = ""
+
+    return getFileData(db_con, filename, *columns)
 
 
 @app.route("/api/download/<filename>", methods=["GET"])
 def downloadFile(filename):
     response = make_response(send_from_directory("../shared_files", filename))
     response.headers["Content-Disposition"] = "attachment"
-    fileID = getFileID(db_con, filename)
+    file = getFileData(db_con, filename)
     userID = request.cookies.get("user_id")
-    addDownloadTransaction(db_con, userID, fileID)
+    addDownloadTransaction(db_con, userID, file[0]['ID'])
     incrementDownloadCount(db_con, filename)
     return response
-
-
-@app.route("/api/file/all", methods=["GET"])
-def allFileData():
-    return getAllFileData(db_con)
 
 
 @app.route("/api/stats", methods=["POST"])
@@ -112,9 +111,4 @@ def getFileStats():
 
 if __name__ == "__main__":
     app.debug = True
-    # print(db_con.execute("SELECT * FROM sqlite_master").fetchall())
-    setupTestUsers(db_con)
-    initialiseFiles(db_con)
-    print(getAllFileData(db_con))
-    print(getFileStatistics(db_con, "image2.jpeg"))
     app.run()
