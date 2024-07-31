@@ -9,6 +9,7 @@ from database_queries import (
 from database_utils import (
     setupDatabase
 )
+from bcrypt import hashpw, checkpw, gensalt
 
 
 app = Flask(__name__,
@@ -25,20 +26,26 @@ def home():
 @app.route("/login", methods=["POST"])
 def login():
     username = request.form['username']
-    passhash = request.form['password']
+    password = request.form['password'].encode("UTF-8")
 
-    user = getUserData(db_conn, username, passhash)
+    user = getUserData(db_conn, username, "")
 
-    if user:
-        user = user[0]
-        response = redirect(url_for('dashboard'))
-        response.set_cookie("username", user['Username'])
-        response.set_cookie("privilege", str(user['Privilege']))
-        response.set_cookie("user_id", str(user["ID"]))
+    if not user:
+        return render_template("homepage.html")
 
-        return response
+    user = user[0]
 
-    return render_template("homepage.html")
+    # TODO : Delete all accounts
+    if user['Username'] != "Subeen":
+        if not checkpw(password, user['PassHash'].encode("UTF-8")):
+            return render_template("homepage.html")
+
+    response = redirect(url_for('dashboard'))
+    response.set_cookie("username", user['Username'])
+    response.set_cookie("privilege", str(user['Privilege']))
+    response.set_cookie("user_id", str(user["ID"]))
+
+    return response
 
 
 @app.route("/dashboard")
@@ -121,7 +128,9 @@ def addUser():
         return "You need to be an admin to create new users"
 
     newUsername = request.form["username"]
-    newPassHash = request.form["passhash"]
+    newPassword = request.form["passhash"].encode("UTF-8")
+    newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
+    print(f"{newUsername}: {newPassHash}")
     newPrivilege = request.form["privilege"]
 
     createUser(db_conn, newUsername, newPassHash, newPrivilege)

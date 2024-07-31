@@ -14,8 +14,7 @@ function displayFileStats() {
             console.log(data[0]);
             for (let file in data) {
                 let paragraph = document.createElement("p");
-                paragraph.innerText = data[file]['FileName'] + ": " 
-                    + data[file]['DownloadCount'];
+                paragraph.innerText = data[file]['FileName'] + ": " + data[file]['DownloadCount'];
                 container.appendChild(paragraph);
             }
         })
@@ -25,4 +24,3 @@ function displayFileStats() {
 }
 
 document.addEventListener('DOMContentLoaded', displayFileStats);
-
