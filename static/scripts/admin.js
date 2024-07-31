@@ -24,3 +24,28 @@ function displayFileStats() {
 }
 
 document.addEventListener('DOMContentLoaded', displayFileStats);
+
+function displayUsers(){
+    let container = document.getElementById("users");
+    fetch ("http://localhost:5000/api/user/search/all?cols=Username&cols=ID")
+        .then (response => {
+            if (response.ok) {
+                return response.json();
+            }
+            else {
+                throw new Error("API request failed.");
+            }
+        })
+        .then (data => {
+            for (let user in data){
+                let paragraph = document.createElement("p");
+                paragraph.innerText = data[user]['ID'] + " " + data[user]['Username'];
+                container.appendChild(paragraph);
+            }
+        })
+        .catch (error => {
+            console.error(error);
+        })
+}
+
+document.addEventListener('DOMContentLoaded', displayUsers);

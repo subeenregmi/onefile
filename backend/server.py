@@ -4,7 +4,7 @@ from flask import (
 )
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
-    incrementDownloadCount, getFileStatistics, createUser
+    incrementDownloadCount, getFileStatistics, createUser, removeUser
 )
 from database_utils import (
     setupDatabase
@@ -21,6 +21,7 @@ db_conn = setupDatabase("onefile.db")
 @app.route("/")
 def home():
     """ The login page users have to use to login to the app """
+
     return render_template("homepage.html")
 
 
@@ -155,6 +156,31 @@ def addUser():
 
     createUser(db_conn, newUsername, newPassHash, newPrivilege)
     return "The new user has been created"
+
+
+@app.route("/api/user/delete", methods=["POST"])
+def deleteUser():
+    """ Api route to delete a user from the database """
+
+    privilege = request.cookies.get("privilege")
+
+    if (privilege != "1"):
+        return "You need to be admin to remove new users"
+
+    username = request.form["username"]
+    removeUser(db_conn, username)
+    return "The user has been deleted"
+
+
+@app.route("/api/user/search/<username>")
+def getUser(username: str):
+    """ Retrieves information about a user """
+    if username == "all":
+        username = ""
+
+    columns = request.args.to_dict(flat=False)['cols']
+
+    return getUserData(db_conn, username, "", *columns)
 
 
 if __name__ == "__main__":

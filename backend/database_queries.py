@@ -190,9 +190,31 @@ def createUser(
         username: The username of the new user
         passhash: The bcrypted hashed password
         privilege: The privilege level of the new user
+
+    Returns: 
+        None
     """
     conn.execute(f"""
         INSERT INTO Users (Username, PassHash, Privilege)
         VALUES ('{username}', '{passhash}', {privilege})
     """)
     conn.commit()
+
+
+def removeUser(
+    conn: sqlite3.Connection,
+    username: str
+):
+    """ Deletes a user from the database
+
+    Args:
+        conn: A sqlite3 connection object connected to the database
+        username: The username of the deleted user
+
+    Returns:
+        None
+    """
+    conn.execute(f"""
+        DELETE FROM Users
+        WHERE Username = '{username}'
+    """)
