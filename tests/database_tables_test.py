@@ -7,13 +7,13 @@ sys.path.insert(0, "..")
 import backend.database_tables as dbtables
 
 try:
-    os.remove("test_db.db")
+    os.remove("temp/test_db.db")
 except FileNotFoundError:
     pass
 
 
 class TestDatabaseTables:
-    db_conn = sqlite3.connect("test_db.db")
+    db_conn = sqlite3.connect("temp/test_db.db")
     db_cur = db_conn.cursor()
     db_cur.execute("PRAGMA foreign_keys = ON;")
     db_conn.commit()

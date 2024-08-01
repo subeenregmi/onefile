@@ -10,8 +10,14 @@ jobs:
       - name: Installing requirements
         run: pip install -r requirements.txt
 
-      - name: Running config tests
+      - name: Running tests for backend/config.py
         run: |
           cd tests
           pytest -v config_test.py
+
+      - name: Running tests for backend/database_tables.py
+        run: pytest -v database_table_test.py
+
+      - name: Running tests for backend/database_utils.py
+        run: pytest -v database_utils_test.py
   

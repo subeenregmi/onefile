@@ -51,17 +51,18 @@ def createTestUsers(conn: sqlite3.Connection):
         conn.commit()
 
 
-def initFiles(conn: sqlite3.Connection):
+def initFiles(conn: sqlite3.Connection, filedir: str):
     """ Creates a file in entry for all the files in the 'shared_files'
     directory.
 
     Args:
         conn: The sqlite3 connection object connected to the database
+        filedir: The directory where we want to look for files
 
     Returns:
         None
     """
-    files = listdir("shared_files/")
+    files = listdir(filedir)
     files = [(x, 0) for x in files]
 
     cur = conn.cursor()
@@ -92,7 +93,7 @@ def setupDatabase(name: str) -> sqlite3.Connection:
     initUserPrivileges(conn)
 
     database_tables.createFileTable(cur)
-    initFiles(conn)
+    initFiles(conn, "shared_files/")
 
     database_tables.createUserTable(cur)
     createTestUsers(conn)
@@ -136,7 +137,6 @@ def createAnonUser(conn: sqlite3.Connection):
         Returns:
             None
     """
-    
     cur = conn.cursor()
 
     anonUser = cur.execute("""

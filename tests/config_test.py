@@ -5,8 +5,8 @@ import backend.config as config
 
 
 class TestConfig:
-    file1 = config.getConfig("test_config_one.yaml")
-    file2 = config.getConfig("test_config_two.yaml")
+    file1 = config.getConfig("temp/test_config_one.yaml")
+    file2 = config.getConfig("temp/test_config_two.yaml")
 
     def test_load_one(self):
         assert self.file1["database"] == "onefile.db"
