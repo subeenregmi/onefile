@@ -8,26 +8,33 @@ from database_queries import (
     removeFileHistory
 )
 from database_utils import (
-    setupDatabase
+    setupDatabase, createAnonUser
 )
 from bcrypt import hashpw, checkpw, gensalt
+from config import getConfig
 
 
+config = getConfig("config.yaml")
 app = Flask(__name__,
             template_folder="../templates/",
             static_folder="../static/")
-app.secret_key = (
-    "7e6dac2a942ba1d025171d1d7d9b9719e003a6c85f599d8a1b0c2fa7d8899af1"
-)
 
-db_conn = setupDatabase("onefile.db")
+app.secret_key = config['secret_key']
+
+db_conn = setupDatabase(config['database'])
 
 
 @app.route("/")
 def home():
     """ The login page users have to use to login to the app """
 
-    return render_template("homepage.html")
+    if config['loginRequired']:
+        return render_template("homepage.html")
+    else:
+        session['username'] = "Anonymous"
+        session['privilege'] = "3"
+        session['user_id'] = "-1"
+        return redirect(url_for('dashboard'))
 
 
 @app.route("/login", methods=["POST"])
@@ -61,6 +68,10 @@ def dashboard():
 
     username = session.get("username")
     privilege = session.get("privilege")
+
+    # Cannot login with the anonymous account if login is needed
+    if username == "Anonymous" and config["loginRequired"]:
+        return redirect(url_for('home'))
 
     match privilege:
         case "1":
@@ -125,6 +136,7 @@ def downloadFile(filename: str):
     """ Api route to download a file. """
 
     response = make_response(send_from_directory("../shared_files", filename))
+
     # Ensuring that files download automatically and not open in browser.
     response.headers["Content-Disposition"] = "attachment"
 
@@ -187,4 +199,8 @@ def getUser(username: str):
 
 if __name__ == "__main__":
     app.debug = True
+
+    if not config['loginRequired']:
+        createAnonUser(db_conn)
+
     app.run()

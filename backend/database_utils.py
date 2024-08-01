@@ -117,3 +117,31 @@ def getTableColumns(tableName: str) -> list[str]:
             return ["Number", "Type"]
         case _:
             return []
+
+
+def createAnonUser(conn: sqlite3.Connection):
+    """ Creates the anonymous user, which represents a user who has not
+        logged in
+
+        The anon user is only created when 'loginRequired' in config.yaml
+        is set to false
+
+        Args:
+            conn: The sqlite3 connection object connected to the database
+
+        Returns:
+            None
+    """
+
+    anonUser = conn.execute("""
+        SELECT *
+        FROM Users
+        WHERE Username = "Anonymous"
+    """).fetchone()
+
+    if not anonUser:
+        conn.execute("""
+            INSERT INTO Users (ID, Username, PassHash, Privilege)
+            VALUES (-1, "Anonymous", "", 3)
+        """)
+        conn.commit()
