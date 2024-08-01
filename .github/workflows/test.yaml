@@ -1,0 +1,17 @@
+name: onefile-tests
+on: [push]
+jobs:
+  run-all-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repo
+        uses: actions/checkout@v4
+
+      - name: Installing requirements
+        run: pip install -r requirements.txt
+
+      - name: Running config tests
+        run: |
+          cd tests
+          pytest -v config_test.py
+  
