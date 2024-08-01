@@ -1,18 +1,18 @@
 import sqlite3
 
 
-def createUserPrivilegesTable(conn: sqlite3.Connection):
+def createUserPrivilegesTable(cur: sqlite3.Cursor):
     """ Creates the user privileges table in the sql database.
 
     Type is one of the following: "Admin", "Uploader", "Viewer".
 
     Args:
-        conn: The sqlite3 connection object connected to the database
+        cur: A cursor to the sqlite3 database
 
     Returns:
         None
     """
-    conn.execute("""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS UserPrivileges (
             Number INTEGER PRIMARY KEY,
             Type VARCHAR(64) NOT NULL
@@ -20,19 +20,19 @@ def createUserPrivilegesTable(conn: sqlite3.Connection):
     """)
 
 
-def createUserTable(conn: sqlite3.Connection):
+def createUserTable(cur: sqlite3.Cursor):
     """ Creates the users tables
 
     This table stores all of the users information, the privilege level
     is used to give the user more or less features.
 
     Args:
-        conn: The sqlite3 connection object connected to the database
+        cur: A cursor to the sqlite3 database
 
     Returns:
         None
     """
-    conn.execute("""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS Users (
             ID INTEGER PRIMARY KEY,
             Username VARCHAR(255),
@@ -43,18 +43,18 @@ def createUserTable(conn: sqlite3.Connection):
     """)
 
 
-def createFileTable(conn: sqlite3.Connection):
+def createFileTable(cur: sqlite3.Cursor):
     """ Creates the files table
 
     This table stores all most all information about a file.
 
     Args:
-        conn: The sqlite3 connection object connected to the database
+        cur: A cursor to the sqlite3 database
 
     Returns:
         None
     """
-    conn.execute("""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS Files (
             ID INTEGER PRIMARY KEY,
             FileName VARCHAR(255) NOT NULL,
@@ -64,17 +64,17 @@ def createFileTable(conn: sqlite3.Connection):
     """)
 
 
-def createDownloadHistoryTable(conn: sqlite3.Connection):
+def createDownloadHistoryTable(cur: sqlite3.Cursor):
     """ Creates the table that stores information on who has downloaded a
     file.
 
     Args:
-        conn: The sqlite3 connection object connected to the database
+        cur: A cursor to the sqlite3 database
 
     Returns:
         None
     """
-    conn.execute("""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS DownloadHistory (
             UserID INTEGER NOT NULL,
             FileID INTEGER NOT NULL,

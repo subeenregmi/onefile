@@ -3,7 +3,7 @@ from database_utils import getTableColumns
 
 
 def getUserData(
-    conn: sqlite3.Connection,
+    cur: sqlite3.Cursor,
     username: str = "",
     passHash: str = "",
     *args: str
@@ -11,7 +11,7 @@ def getUserData(
     """ This function gets a user(s) information provided the username
 
     Args:
-        conn: A sqlite3 connection object connected to the database
+        cur: A sqlite3 cursor pointing to the database
         username: The username of the user, if omitted then it matches
                   all users
         passHash: The hash of the users password, if omitted then it
@@ -23,7 +23,7 @@ Returns:
         is the stored data for that user.
     """
 
-    users = conn.execute(f"""
+    users = cur.execute(f"""
         SELECT {", ".join([*args]) or "*"}
         FROM Users
         WHERE Username = {f"'{username}'" if username != "" else "Username"} 
@@ -35,14 +35,14 @@ Returns:
 
 
 def getFileData(
-    conn: sqlite3.Connection,
+    cur: sqlite3.Cursor,
     filename: str = "",
     *args: str
 ) -> list[dict[str, str | int | None]]:
     """ This function gets a file(s) information provided the filename
 
     Args:
-        conn: A sqlite3 connection object connected to the database
+        cur: A sqlite3 cursor pointing to the database
         filename: The file's name, if left then it will match all filenames
         *args: This represent all the columns that we want to query, by
                default this is all columns
@@ -52,7 +52,7 @@ def getFileData(
         the stored data for that user.
     """
 
-    files = conn.execute(f"""
+    files = cur.execute(f"""
         SELECT {", ".join([*args]) or "*"}
         FROM Files
         WHERE FileName = {f"'{filename}'" if filename != "" else "FileName"}
@@ -63,14 +63,14 @@ def getFileData(
 
 
 def getFileStatistics(
-    conn: sqlite3.Connection,
+    cur: sqlite3.Cursor,
     filename: str = "",
     *args: str
 ) -> list[dict[str, str | int | None]]:
     """ Gets the download history of a file
 
     Args:
-        conn: A sqlite3 connection object connected to the database
+        cur: A sqlite3 cursor pointing to the database
         filename: The file's name, if left then it will match all filenames
         *args: This represent all the columns that we want to query, by
                default this is all columns
@@ -81,11 +81,11 @@ def getFileStatistics(
     """
 
     if filename:
-        fileID = getFileData(conn, filename, "ID")[0]["ID"]
+        fileID = getFileData(cur, filename, "ID")[0]["ID"]
     else:
         fileID = "FileID"
 
-    files = conn.execute(f"""
+    files = cur.execute(f"""
         SELECT {", ".join([*args]) or "*"}
         FROM DownloadHistory INNER JOIN Users
         ON DownloadHistory.UserID = Users.ID
@@ -109,7 +109,8 @@ def addFile(conn: sqlite3.Connection, filename: str):
         None
     """
 
-    conn.execute(f"""
+    cur = conn.cursor()
+    cur.execute(f"""
         INSERT INTO Files (FileName, DownloadCount, UploadDate)
         VALUES ('{filename}', 0, DATETIME('now'));
     """)
@@ -126,7 +127,8 @@ def incrementDownloadCount(conn: sqlite3.Connection, filename: str):
     Returns:
         None
     """
-    conn.execute(f"""
+    cur = conn.cursor()
+    cur.execute(f"""
         UPDATE Files
         SET DownloadCount = DownloadCount + 1
         WHERE FileName = '{filename}';
@@ -147,7 +149,8 @@ def removeFile(conn: sqlite3.Connection, filename: str):
     Returns: None
     """
 
-    conn.execute(f"""
+    cur = conn.cursor()
+    cur.execute(f"""
         DELETE FROM Files
         WHERE FileName = '{filename}'
     """)
@@ -166,11 +169,11 @@ def removeFileHistory(conn: sqlite3.Connection, filename: str):
     Returns:
         None
     """
-
-    fileData = getFileData(conn, filename, "ID")[0]
+    cur = conn.cursor()
+    fileData = getFileData(cur, filename, "ID")[0]
     fileID = fileData['ID']
 
-    conn.execute(f"""
+    cur.execute(f"""
         DELETE FROM DownloadHistory
         WHERE FileID = {fileID}
     """)
@@ -193,7 +196,8 @@ def addDownloadTransaction(
     Returns:
         None
     """
-    conn.execute(f"""
+    cur = conn.cursor()
+    cur.execute(f"""
         INSERT INTO DownloadHistory (UserID, FileID, Timestamp)
         VALUES ('{userID}', '{fileID}', DATETIME('now'))
     """)
@@ -217,7 +221,8 @@ def createUser(
     Returns:
         None
     """
-    conn.execute(f"""
+    cur = conn.cursor()
+    cur.execute(f"""
         INSERT INTO Users (Username, PassHash, Privilege)
         VALUES ('{username}', '{passhash}', {privilege})
     """)
@@ -237,7 +242,9 @@ def removeUser(
     Returns:
         None
     """
-    conn.execute(f"""
+    cur = conn.cursor()
+    cur.execute(f"""
         DELETE FROM Users
         WHERE Username = '{username}'
     """)
+    conn.commit()

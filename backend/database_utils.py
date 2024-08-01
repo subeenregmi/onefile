@@ -18,8 +18,9 @@ def initUserPrivileges(conn: sqlite3.Connection):
         (2, "Uploader"),
         (3, "Viewer")
     ]
-    if (conn.execute("SELECT * FROM UserPrivileges").fetchone() is None):
-        conn.executemany("""
+    cur = conn.cursor()
+    if (cur.execute("SELECT * FROM UserPrivileges").fetchone() is None):
+        cur.executemany("""
             INSERT INTO UserPrivileges (Number, Type) VALUES (?, ?)
             """, privileges)
         conn.commit()
@@ -41,8 +42,9 @@ def createTestUsers(conn: sqlite3.Connection):
             "1"
         )
     ]
-    if (conn.execute("SELECT * FROM Users").fetchone() is None):
-        conn.executemany("""
+    cur = conn.cursor()
+    if (cur.execute("SELECT * FROM Users").fetchone() is None):
+        cur.executemany("""
             INSERT INTO Users (Username, PassHash, Privilege)
             VALUES (?, ?, ?)
         """, testUsers)
@@ -62,8 +64,9 @@ def initFiles(conn: sqlite3.Connection):
     files = listdir("shared_files/")
     files = [(x, 0) for x in files]
 
-    if (conn.execute("SELECT * FROM Files;").fetchone() is None):
-        conn.executemany("""
+    cur = conn.cursor()
+    if (cur.execute("SELECT * FROM Files;").fetchone() is None):
+        cur.executemany("""
             INSERT INTO Files (FileName, DownloadCount, UploadDate)
             VALUES (?, ?, DATETIME('now'))
         """, files)
@@ -80,20 +83,21 @@ def setupDatabase(name: str) -> sqlite3.Connection:
         A connection to the database
     """
     conn = sqlite3.connect(name, check_same_thread=False)
+    cur = conn.cursor()
 
-    conn.execute("PRAGMA foreign_keys = ON;")
+    cur.execute("PRAGMA foreign_keys = ON;")
     conn.commit()
 
-    database_tables.createUserPrivilegesTable(conn)
+    database_tables.createUserPrivilegesTable(cur)
     initUserPrivileges(conn)
 
-    database_tables.createFileTable(conn)
+    database_tables.createFileTable(cur)
     initFiles(conn)
 
-    database_tables.createUserTable(conn)
+    database_tables.createUserTable(cur)
     createTestUsers(conn)
 
-    database_tables.createDownloadHistoryTable(conn)
+    database_tables.createDownloadHistoryTable(cur)
     return conn
 
 
@@ -132,15 +136,17 @@ def createAnonUser(conn: sqlite3.Connection):
         Returns:
             None
     """
+    
+    cur = conn.cursor()
 
-    anonUser = conn.execute("""
+    anonUser = cur.execute("""
         SELECT *
         FROM Users
         WHERE Username = "Anonymous"
     """).fetchone()
 
     if not anonUser:
-        conn.execute("""
+        cur.execute("""
             INSERT INTO Users (ID, Username, PassHash, Privilege)
             VALUES (-1, "Anonymous", "", 3)
         """)

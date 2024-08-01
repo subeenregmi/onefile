@@ -22,6 +22,7 @@ app = Flask(__name__,
 app.secret_key = config['secret_key']
 
 db_conn = setupDatabase(config['database'])
+db_cur = db_conn.cursor()
 
 
 @app.route("/")
@@ -128,7 +129,7 @@ def getFile(filename):
     if filename == "all":
         filename = ""
 
-    return getFileData(db_conn, filename, *columns)
+    return getFileData(db_cur, filename, *columns)
 
 
 @app.route("/api/download/<filename>", methods=["GET"])
@@ -140,7 +141,7 @@ def downloadFile(filename: str):
     # Ensuring that files download automatically and not open in browser.
     response.headers["Content-Disposition"] = "attachment"
 
-    file = getFileData(db_conn, filename)
+    file = getFileData(db_cur, filename)
     userID = session.get("user_id")
 
     addDownloadTransaction(db_conn, userID, file[0]['ID'])
@@ -152,7 +153,7 @@ def downloadFile(filename: str):
 @app.route("/api/file/stats", methods=["POST"])
 def getFileStats():
     """ Api route to retrieve file download history.  """
-    return getFileStatistics(db_conn, request.form['filename'])
+    return getFileStatistics(db_cur, request.form['filename'])
 
 
 @app.route("/api/user/create", methods=["POST"])
@@ -194,7 +195,7 @@ def getUser(username: str):
 
     columns = request.args.to_dict(flat=False)['cols']
 
-    return getUserData(db_conn, username, "", *columns)
+    return getUserData(db_cur, username, "", *columns)
 
 
 if __name__ == "__main__":
