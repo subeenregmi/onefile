@@ -16,7 +16,7 @@ jobs:
           pytest -v config_test.py
 
       - name: Running tests for backend/database_tables.py
-        run: pytest -v database_table_test.py
+        run: pytest -v database_tables_test.py
 
       - name: Running tests for backend/database_utils.py
         run: pytest -v database_utils_test.py
