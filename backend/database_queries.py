@@ -11,7 +11,7 @@ def getUserData(
     """ This function gets a user(s) information provided the username
 
     Args:
-        cur: A sqlite3 cursor pointing to the database
+        conn: The sqlite3 connection object connected to the database
         username: The username of the user, if omitted then it matches
                   all users
         passHash: The hash of the users password, if omitted then it
@@ -42,7 +42,7 @@ def getFileData(
     """ This function gets a file(s) information provided the filename
 
     Args:
-        cur: A sqlite3 cursor pointing to the database
+        conn: The sqlite3 connection object connected to the database
         filename: The file's name, if left then it will match all filenames
         *args: This represent all the columns that we want to query, by
                default this is all columns
@@ -70,7 +70,7 @@ def getFileStatistics(
     """ Gets the download history of a file
 
     Args:
-        cur: A sqlite3 cursor pointing to the database
+        conn: The sqlite3 connection object connected to the database
         filename: The file's name, if left then it will match all filenames
         *args: This represent all the columns that we want to query, by
                default this is all columns

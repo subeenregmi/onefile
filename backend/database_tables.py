@@ -7,7 +7,7 @@ def createUserPrivilegesTable(conn: sqlite3.Connection):
     Type is one of the following: "Admin", "Uploader", "Viewer".
 
     Args:
-        cur: A cursor to the sqlite3 database
+        conn: An sqlite connection to the database
 
     Returns:
         None
@@ -28,7 +28,7 @@ def createUserTable(conn: sqlite3.Connection):
     is used to give the user more or less features.
 
     Args:
-        cur: A cursor to the sqlite3 database
+        conn: An sqlite connection to the database
 
     Returns:
         None
@@ -51,7 +51,7 @@ def createFileTable(conn: sqlite3.Connection):
     This table stores all most all information about a file.
 
     Args:
-        cur: A cursor to the sqlite3 database
+        conn: An sqlite connection to the database
 
     Returns:
         None
@@ -72,7 +72,7 @@ def createDownloadHistoryTable(conn: sqlite3.Connection):
     file.
 
     Args:
-        cur: A cursor to the sqlite3 database
+        conn: An sqlite connection to the database
 
     Returns:
         None
