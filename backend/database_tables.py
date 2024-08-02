@@ -1,7 +1,7 @@
 import sqlite3
 
 
-def createUserPrivilegesTable(cur: sqlite3.Cursor):
+def createUserPrivilegesTable(conn: sqlite3.Connection):
     """ Creates the user privileges table in the sql database.
 
     Type is one of the following: "Admin", "Uploader", "Viewer".
@@ -12,6 +12,7 @@ def createUserPrivilegesTable(cur: sqlite3.Cursor):
     Returns:
         None
     """
+    cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS UserPrivileges (
             Number INTEGER PRIMARY KEY,
@@ -20,7 +21,7 @@ def createUserPrivilegesTable(cur: sqlite3.Cursor):
     """)
 
 
-def createUserTable(cur: sqlite3.Cursor):
+def createUserTable(conn: sqlite3.Connection):
     """ Creates the users tables
 
     This table stores all of the users information, the privilege level
@@ -32,6 +33,7 @@ def createUserTable(cur: sqlite3.Cursor):
     Returns:
         None
     """
+    cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS Users (
             ID INTEGER PRIMARY KEY,
@@ -43,7 +45,7 @@ def createUserTable(cur: sqlite3.Cursor):
     """)
 
 
-def createFileTable(cur: sqlite3.Cursor):
+def createFileTable(conn: sqlite3.Connection):
     """ Creates the files table
 
     This table stores all most all information about a file.
@@ -54,6 +56,7 @@ def createFileTable(cur: sqlite3.Cursor):
     Returns:
         None
     """
+    cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS Files (
             ID INTEGER PRIMARY KEY,
@@ -64,7 +67,7 @@ def createFileTable(cur: sqlite3.Cursor):
     """)
 
 
-def createDownloadHistoryTable(cur: sqlite3.Cursor):
+def createDownloadHistoryTable(conn: sqlite3.Connection):
     """ Creates the table that stores information on who has downloaded a
     file.
 
@@ -74,6 +77,7 @@ def createDownloadHistoryTable(cur: sqlite3.Cursor):
     Returns:
         None
     """
+    cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS DownloadHistory (
             UserID INTEGER NOT NULL,

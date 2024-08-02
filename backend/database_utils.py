@@ -26,8 +26,11 @@ def initUserPrivileges(conn: sqlite3.Connection):
         conn.commit()
 
 
-def createTestUsers(conn: sqlite3.Connection):
-    """ This function creates some test users.
+def createDefaultUser(conn: sqlite3.Connection):
+    """ This function creates the default root users.
+
+    username: root
+    password: root
 
     Args:
         conn: The sqlite3 connection object connected to the database
@@ -89,16 +92,16 @@ def setupDatabase(name: str) -> sqlite3.Connection:
     cur.execute("PRAGMA foreign_keys = ON;")
     conn.commit()
 
-    database_tables.createUserPrivilegesTable(cur)
+    database_tables.createUserPrivilegesTable(conn)
     initUserPrivileges(conn)
 
-    database_tables.createFileTable(cur)
+    database_tables.createFileTable(conn)
     initFiles(conn, "shared_files/")
 
-    database_tables.createUserTable(cur)
-    createTestUsers(conn)
+    database_tables.createUserTable(conn)
+    createDefaultUser(conn)
 
-    database_tables.createDownloadHistoryTable(cur)
+    database_tables.createDownloadHistoryTable(conn)
     return conn
 
 

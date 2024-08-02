@@ -55,15 +55,15 @@ class TestDatabaseUtils:
         """).fetchone()
         assert test[0] == "Uploader"
 
-    def test_createTestUsers_one(self):
-        dbutils.createTestUsers(self.db_conn)
+    def test_createDefaultUser_one(self):
+        dbutils.createDefaultUser(self.db_conn)
         test = self.db_cur.execute("""
             SELECT Username
             FROM Users
         """).fetchone()
         assert test[0] == "root"
 
-    def test_createTestUsers_two(self):
+    def test_createDefaultUser_two(self):
         test = self.db_cur.execute("""
             SELECT PassHash
             FROM Users

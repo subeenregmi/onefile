@@ -3,7 +3,7 @@ from database_utils import getTableColumns
 
 
 def getUserData(
-    cur: sqlite3.Cursor,
+    conn: sqlite3.Connection,
     username: str = "",
     passHash: str = "",
     *args: str
@@ -22,7 +22,7 @@ Returns:
         A list of dictionaries in which the key is a column and the value
         is the stored data for that user.
     """
-
+    cur = conn.cursor()
     users = cur.execute(f"""
         SELECT {", ".join([*args]) or "*"}
         FROM Users
@@ -35,7 +35,7 @@ Returns:
 
 
 def getFileData(
-    cur: sqlite3.Cursor,
+    conn: sqlite3.Connection,
     filename: str = "",
     *args: str
 ) -> list[dict[str, str | int | None]]:
@@ -51,7 +51,7 @@ def getFileData(
         A list of dictionaries in which the key is a column and value is
         the stored data for that user.
     """
-
+    cur = conn.cursor()
     files = cur.execute(f"""
         SELECT {", ".join([*args]) or "*"}
         FROM Files
@@ -63,7 +63,7 @@ def getFileData(
 
 
 def getFileStatistics(
-    cur: sqlite3.Cursor,
+    conn: sqlite3.Connection,
     filename: str = "",
     *args: str
 ) -> list[dict[str, str | int | None]]:
@@ -79,9 +79,10 @@ def getFileStatistics(
         List of dictionaries in which each dictionary contains the information
         for each download.
     """
+    cur = conn.cursor()
 
     if filename:
-        fileID = getFileData(cur, filename, "ID")[0]["ID"]
+        fileID = getFileData(conn, filename, "ID")[0]["ID"]
     else:
         fileID = "FileID"
 
@@ -170,7 +171,7 @@ def removeFileHistory(conn: sqlite3.Connection, filename: str):
         None
     """
     cur = conn.cursor()
-    fileData = getFileData(cur, filename, "ID")[0]
+    fileData = getFileData(conn, filename, "ID")[0]
     fileID = fileData['ID']
 
     cur.execute(f"""
