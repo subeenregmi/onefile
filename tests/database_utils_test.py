@@ -3,9 +3,10 @@ import sqlite3
 import sys
 import os
 import bcrypt
+sys.path.insert(0, "..")
 sys.path.insert(
-    0,
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+   0,
+   os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 )
 import backend.database_tables as dbtables
 import backend.database_utils as dbutils

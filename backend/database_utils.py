@@ -77,7 +77,10 @@ def initFiles(conn: sqlite3.Connection, filedir: str):
         conn.commit()
 
 
-def setupDatabase(name: str) -> sqlite3.Connection:
+def setupDatabase(
+    name: str,
+    filesFolder: str = "shared_files/"
+) -> sqlite3.Connection:
     """ Setups the database and all tables.
 
     Args:
@@ -96,7 +99,7 @@ def setupDatabase(name: str) -> sqlite3.Connection:
     initUserPrivileges(conn)
 
     database_tables.createFileTable(conn)
-    initFiles(conn, "shared_files/")
+    initFiles(conn, filesFolder)
 
     database_tables.createUserTable(conn)
     createDefaultUser(conn)
