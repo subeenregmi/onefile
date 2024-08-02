@@ -23,10 +23,10 @@ class TestDatabaseUtils:
     db_cur.execute("PRAGMA foreign_keys = ON;")
     db_conn.commit()
 
-    dbtables.createUserPrivilegesTable(db_cur)
-    dbtables.createUserTable(db_cur)
-    dbtables.createFileTable(db_cur)
-    dbtables.createDownloadHistoryTable(db_cur)
+    dbtables.createUserPrivilegesTable(db_conn)
+    dbtables.createUserTable(db_conn)
+    dbtables.createFileTable(db_conn)
+    dbtables.createDownloadHistoryTable(db_conn)
 
     def test_initUserPrivileges_one(self):
         dbutils.initUserPrivileges(self.db_conn)

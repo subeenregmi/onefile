@@ -19,7 +19,7 @@ class TestDatabaseTables:
     db_conn.commit()
 
     def test_user_privileges_create(self):
-        dbtables.createUserPrivilegesTable(self.db_cur)
+        dbtables.createUserPrivilegesTable(self.db_conn)
         tables = self.db_cur.execute("""
             SELECT name FROM sqlite_master;
         """).fetchone()
@@ -39,7 +39,7 @@ class TestDatabaseTables:
         assert test[0] == "Admin"
 
     def test_users_create(self):
-        dbtables.createUserTable(self.db_cur)
+        dbtables.createUserTable(self.db_conn)
         tables = self.db_cur.execute("""
             SELECT name
             FROM sqlite_master
@@ -71,7 +71,7 @@ class TestDatabaseTables:
         assert excinfo.type == sqlite3.IntegrityError
 
     def test_files_create(self):
-        dbtables.createFileTable(self.db_cur)
+        dbtables.createFileTable(self.db_conn)
         tables = self.db_cur.execute("""
             SELECT name
             FROM sqlite_master
@@ -93,7 +93,7 @@ class TestDatabaseTables:
         assert test[0] == 0
 
     def test_download_history_create(self):
-        dbtables.createDownloadHistoryTable(self.db_cur)
+        dbtables.createDownloadHistoryTable(self.db_conn)
         tables = self.db_cur.execute("""
             SELECT name
             FROM sqlite_master
