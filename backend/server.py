@@ -2,6 +2,7 @@ from flask import (
     Flask, render_template, request, send_from_directory, make_response,
     redirect, url_for, session
 )
+from werkzeug.utils import secure_filename
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
     incrementDownloadCount, getFileStatistics, createUser, removeUser,
@@ -85,6 +86,9 @@ def login():
 
     # If the user does not exist, redirect to homepage
     if not user:
+        app.logger.info(
+            f"User '{username}' tried to login, but does not exist."
+        )
         return render_template("homepage.html")
 
     user = user[0]
@@ -106,6 +110,10 @@ def dashboard():
 
     username = session.get("username")
     privilege = session.get("privilege")
+
+    if username is None:
+        app.logger.info("User tried to access dashboard before logging in.")
+        return redirect(url_for('home'))
 
     # Cannot login with the anonymous account if login is needed
     if username == "Anonymous" and config["loginRequired"]:
@@ -150,6 +158,24 @@ def uploadFile():
 
     filename = request.form["filename"]
     file = request.files["file"]
+
+    # Empty file name
+    if filename is None or filename == "":
+        app.logger.info(
+            f"User '{username}' is trying to upload a file with no name."
+        )
+        return "You need to specify a name for the file"
+
+    filename = secure_filename(filename)
+
+    # File name is taken
+    if getFileData(db_conn, filename):
+        app.logger.info(
+            f"User '{username}' is trying to upload '{filename}', "
+            "this name has been taken."
+        )
+        return "The file name you have specified has already been chosen"
+
     file.save(f"shared_files/{filename}")
     addFile(db_conn, filename)
 
