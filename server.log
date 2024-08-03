@@ -1,0 +1,146 @@
+[13:16 - 03-08-2024 ] | INFO _log | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[13:16 - 03-08-2024 ] | INFO _log | [33mPress CTRL+C to quit[0m
+[13:16 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:16 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:16 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:20 - 03-08-2024 ] | INFO _log | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[13:20 - 03-08-2024 ] | INFO _log | [33mPress CTRL+C to quit[0m
+[13:20 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:20 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:20 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:30 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:30 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:30 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:30 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:30 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:30 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:30 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:30 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:37 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:37 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:37 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:37 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:40 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:40 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:40 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:40 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:41 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:41 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:41 - 03-08-2024 ] | INFO <module> | Starting app...
+[13:41 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:41 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:41 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:41 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:41 - 03-08-2024 ] | INFO main | Starting app...
+[13:41 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:41 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:43 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:43 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:44 - 03-08-2024 ] | INFO main | Starting app...
+[13:44 - 03-08-2024 ] | INFO _log | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[13:44 - 03-08-2024 ] | INFO _log | [33mPress CTRL+C to quit[0m
+[13:44 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:44 - 03-08-2024 ] | INFO main | Starting app...
+[13:44 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:44 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:45 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:45 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:45 - 03-08-2024 ] | INFO main | ==============================
+[13:45 - 03-08-2024 ] | INFO main | Starting app...
+[13:45 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:45 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:45 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:45 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:45 - 03-08-2024 ] | INFO main | ==================================================
+[13:45 - 03-08-2024 ] | INFO main | Starting app...
+[13:45 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:45 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:45 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:45 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:45 - 03-08-2024 ] | INFO main | ==================================================
+[13:45 - 03-08-2024 ] | INFO main | Starting app...
+[13:45 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:45 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:46 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:46 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:46 - 03-08-2024 ] | INFO main | ==================================================
+[13:46 - 03-08-2024 ] | INFO main | Starting app...
+[13:46 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:46 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:47 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:47 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:47 - 03-08-2024 ] | INFO main | ==================================================
+[13:47 - 03-08-2024 ] | INFO main | Starting app...
+[13:47 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:47 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:47 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:47 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:47 - 03-08-2024 ] | INFO main | ==================================================
+[13:47 - 03-08-2024 ] | INFO main | Starting app...
+[13:47 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:47 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:47 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:47 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:47 - 03-08-2024 ] | INFO main | ==================================================
+[13:47 - 03-08-2024 ] | INFO main | Starting app...
+[13:47 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:47 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:48 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:48:15] "[32mPOST /login HTTP/1.1[0m" 302 -
+[13:48 - 03-08-2024 ] | INFO dashboard | Admin 'root' has successfully logged in.
+[13:48 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:48:15] "GET /dashboard HTTP/1.1" 200 -
+[13:48 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:48:16] "[36mGET /static/scripts/admin.js HTTP/1.1[0m" 304 -
+[13:48 - 03-08-2024 ] | DEBUG getFile | File information for  is being retrieved.
+[13:48 - 03-08-2024 ] | DEBUG getUser | User data for '' has been retrieved.
+[13:48 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:48:16] "GET /api/file/all?cols=FileName&cols=DownloadCount HTTP/1.1" 200 -
+[13:48 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:48:16] "GET /api/user/search/all?cols=Username&cols=ID HTTP/1.1" 200 -
+[13:49 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:49 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:49 - 03-08-2024 ] | INFO main | ==================================================
+[13:49 - 03-08-2024 ] | INFO main | Starting app...
+[13:49 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:49 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:49 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:49 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:49 - 03-08-2024 ] | INFO main | ==================================================
+[13:49 - 03-08-2024 ] | INFO main | Starting app...
+[13:49 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:49 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:49 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:49 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:49 - 03-08-2024 ] | INFO main | ==================================================
+[13:49 - 03-08-2024 ] | INFO main | Starting app...
+[13:49 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:49 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:49 - 03-08-2024 ] | DEBUG getFileStats | File statistics for 'image2.jpeg' retrieved.
+[13:49 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:49:56] "POST /api/file/stats HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO deleteFile | User root has delete a new file: 'background.jpg'.
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:17] "POST /api/file/delete HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO dashboard | Admin 'root' has successfully logged in.
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "GET /dashboard HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "[36mGET /static/scripts/admin.js HTTP/1.1[0m" 304 -
+[13:50 - 03-08-2024 ] | DEBUG getFile | File information for * is being retrieved.
+[13:50 - 03-08-2024 ] | DEBUG getUser | User data for '*' has been retrieved.
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "GET /api/file/all?cols=FileName&cols=DownloadCount HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "GET /api/user/search/all?cols=Username&cols=ID HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO dashboard | Admin 'root' has successfully logged in.
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "GET /dashboard HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "[36mGET /static/scripts/admin.js HTTP/1.1[0m" 304 -
+[13:50 - 03-08-2024 ] | DEBUG getFile | File information for * is being retrieved.
+[13:50 - 03-08-2024 ] | DEBUG getUser | User data for '*' has been retrieved.
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "GET /api/file/all?cols=FileName&cols=DownloadCount HTTP/1.1" 200 -
+[13:50 - 03-08-2024 ] | INFO _log | 127.0.0.1 - - [03/Aug/2024 13:50:19] "GET /api/user/search/all?cols=Username&cols=ID HTTP/1.1" 200 -
+[13:51 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:51 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:51 - 03-08-2024 ] | INFO main | ==================================================
+[13:51 - 03-08-2024 ] | INFO main | Starting app...
+[13:51 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:51 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
+[13:51 - 03-08-2024 ] | INFO _log |  * Detected change in '/home/subeen/subeenfiles/code/OneFile/backend/server.py', reloading
+[13:51 - 03-08-2024 ] | INFO _log |  * Restarting with stat
+[13:51 - 03-08-2024 ] | INFO main | ==================================================
+[13:51 - 03-08-2024 ] | INFO main | Starting app...
+[13:51 - 03-08-2024 ] | WARNING _log |  * Debugger is active!
+[13:51 - 03-08-2024 ] | INFO _log |  * Debugger PIN: 888-831-260
