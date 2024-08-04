@@ -53,5 +53,15 @@
             <input type="text" id="username1" name="username">
             <input type="submit" value="Submit">
         </form>
+        <h3> Page stats </h3>
+        <div id="page-data">
+        </div>
+        <h3> Search page stats </h3>
+        <form action="{{url_for('getPageStats')}}" method="post">
+            <label for="pagename"> Page Name: </label>
+            <input type="text" id="pagename" name="pagename">
+            <input type="submit" value="Submit">
+        </form>
+
     </body>
 </html>

@@ -6,7 +6,8 @@ from werkzeug.utils import secure_filename
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
     incrementDownloadCount, getFileStatistics, createUser, removeUser,
-    removeFileHistory
+    removeFileHistory, addPageVisit, incrementPageVisits, getPageData,
+    getPageVisitsData
 )
 from database_utils import (
     setupDatabase, createAnonUser
@@ -64,6 +65,8 @@ db_conn = setupDatabase(config['database'])
 @app.route("/")
 def home():
     """ The login page users have to use to login to the app """
+    incrementPageVisits(db_conn, "home")
+    addPageVisit(db_conn, "home", None, request.remote_addr)
 
     if config['loginRequired']:
         return render_template("homepage.html")
@@ -121,6 +124,14 @@ def dashboard():
             "Anonymous passed login but failed dashboard check."
         )
         return redirect(url_for('home'))
+
+    incrementPageVisits(db_conn, "dashboard")
+    addPageVisit(
+        db_conn,
+        "dashboard",
+        session.get("user_id"),
+        request.remote_addr
+    )
 
     match privilege:
         case "1":
@@ -308,6 +319,28 @@ def getUser(username: str):
     return getUserData(db_conn, username, "", *columns)
 
 
+@app.route("/api/pages/history", methods=["POST"])
+def getPageStats():
+    """ Retrieves page viewing history. """
+
+    pageName = request.form["pagename"]
+    app.logger.info("")
+    pageID = getPageData(db_conn, pageName, "ID")[0]["ID"]
+
+    return getPageVisitsData(db_conn, pageID)
+
+
+@app.route("/api/pages/<pageName>")
+def retrievePageData(pageName: str):
+    """ Retrieves information about a page """
+
+    if pageName == "all":
+        pageName = ""
+
+    columns = request.args.to_dict(flat=False)['cols']
+    return getPageData(db_conn, pageName, *columns)
+
+
 def main():
     app.debug = True
 
@@ -317,7 +350,7 @@ def main():
 
     app.logger.info("="*50)
     app.logger.info("Starting app...")
-    app.run()
+    app.run(host="0.0.0.0")
 
 
 if __name__ == "__main__":

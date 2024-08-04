@@ -1,6 +1,6 @@
 function createDownloadLinks() {
     let container = document.getElementById("files");
-    fetch('http://localhost:5000/api/file/all?cols=FileName')
+    fetch('http://192.168.0.200:5000/api/file/all?cols=FileName')
         .then(response => {
             if (response.ok) {
                 return response.json();

@@ -249,3 +249,107 @@ def removeUser(
         WHERE Username = '{username}'
     """)
     conn.commit()
+
+
+def incrementPageVisits(conn: sqlite3.Connection, name: str):
+    """ This increments the page view count in the pages table
+
+    Args:
+        conn: The sqlite connection to the database
+        name: The page we want to view
+
+    Returns:
+        None
+    """
+    cur = conn.cursor()
+    cur.execute(f"""
+        UPDATE Pages
+        SET ViewCount = ViewCount + 1
+        WHERE Name = '{name}';
+    """)
+    conn.commit()
+
+
+def getPageData(
+    conn: sqlite3.Connection,
+    pageName: str = "",
+    *args: str
+) -> list[dict[str, str | int | None]]:
+    """
+    Args:
+        conn: The sqlite3 connection object connected to the database
+        pageName: The page's name we want to query data from
+        *args: This represent all the columns that we want to query, by
+               default this is all columns
+
+    Returns:
+        List of dictionaries in which each dictionary contains the information
+        for each page.
+    """
+
+    cur = conn.cursor()
+    pages = cur.execute(f"""
+        SELECT {", ".join([*args]) or "*"}
+        FROM Pages 
+        WHERE Name = {f"'{pageName}'" if pageName != "" else "Name"}
+     """).fetchall()
+
+    columns = [*args] or getTableColumns("Pages")
+    return [dict(zip(columns, page)) for page in pages]
+
+
+def addPageVisit(
+    conn: sqlite3.Connection,
+    pageName: str,
+    userID: int | None,
+    ipAddress: str
+):
+    """ This adds a page visit transaction for a page in the PageVisits table
+
+    Args:
+        conn: The sqlite connection to the database
+        pageName: The page we want to add a visit for
+        userID: The user who went the page
+        ipAddress: The ip address of the user
+
+    Returns:
+        None
+    """
+    cur = conn.cursor()
+
+    pageID = getPageData(conn, pageName, "ID")[0]["ID"]
+
+    cur.execute(f"""
+        INSERT INTO PageVisits (PageID, UserID, IpAddress, Timestamp)
+        VALUES ({pageID}, {userID or "NULL"}, '{ipAddress}', DATETIME('now'))
+    """)
+    conn.commit()
+
+
+def getPageVisitsData(
+    conn: sqlite3.Connection,
+    pageID: int,
+    *args: str
+) -> list[dict[str, str | int | None]]:
+    """
+    Args:
+        conn: The sqlite3 connection object connected to the database
+        pageName: The page's name we want to query visits from
+        *args: This represent all the columns that we want to query, by
+               default this is all columns
+
+    Returns:
+        List of dictionaries in which each dictionary contains the visit
+        history for each page.
+    """
+
+    cur = conn.cursor()
+
+    pages = cur.execute(f"""
+        SELECT {", ".join([*args]) or "*"}
+        FROM PageVisits
+        WHERE PageID = {pageID}
+     """).fetchall()
+
+    columns = [*args] or getTableColumns("PageVisits")
+    return [dict(zip(columns, page)) for page in pages]

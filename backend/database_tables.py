@@ -87,3 +87,45 @@ def createDownloadHistoryTable(conn: sqlite3.Connection):
             FOREIGN KEY (FileID) REFERENCES Files (ID)
         );
     """)
+
+
+def createPagesTable(conn: sqlite3.Connection):
+    """ Creates the table that stores the page information.
+
+    Args:
+        conn: An sqlite connection to the database
+
+    Returns:
+        None
+    """
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS Pages (
+            ID INTEGER PRIMARY KEY,
+            Name VARCHAR(64) NOT NULL,
+            ViewCount INTEGER
+        );
+    """)
+
+
+def createPageVisitsTable(conn: sqlite3.Connection):
+    """ Creates the table that stores all the page visits
+
+    Args:
+        conn: An sqlite3 connection to the database
+
+    Returns:
+        None
+    """
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS PageVisits (
+            ID INTEGER PRIMARY KEY,
+            PageID INTEGER,
+            UserID INTEGER,
+            IpAddress VARCHAR(64),
+            Timestamp DATE NOT NULL,
+            FOREIGN KEY (PageID) REFERENCES Pages (ID)
+            FOREIGN KEY (UserID) REFERENCES Users (ID)
+        );
+    """)

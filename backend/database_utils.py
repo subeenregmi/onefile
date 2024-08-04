@@ -105,6 +105,12 @@ def setupDatabase(
     createDefaultUser(conn)
 
     database_tables.createDownloadHistoryTable(conn)
+
+    database_tables.createPagesTable(conn)
+    database_tables.createPageVisitsTable(conn)
+
+    createPageEntries(conn)
+
     return conn
 
 
@@ -126,6 +132,10 @@ def getTableColumns(tableName: str) -> list[str]:
             return ["UserID", "FileID", "Timestamp"]
         case "UserPrivileges":
             return ["Number", "Type"]
+        case "Pages":
+            return ["ID", "Name", "ViewCount"]
+        case "PageVisits":
+            return ["ID", "PageID", "UserID", "IpAddress", "Timestamp"]
         case _:
             return []
 
@@ -156,4 +166,32 @@ def createAnonUser(conn: sqlite3.Connection):
             INSERT INTO Users (ID, Username, PassHash, Privilege)
             VALUES (-1, "Anonymous", "", 3)
         """)
+        conn.commit()
+
+
+def createPageEntries(conn: sqlite3.Connection):
+    """ Creates the page entries for the pages in the website.
+
+    Args:
+        conn: The sqlite3 connection object connected to the database
+
+    Returns:
+        None
+    """
+    pages = [
+        ("home", 0),
+        ("dashboard", 0)
+    ]
+    cur = conn.cursor()
+
+    pageEntries = cur.execute("""
+        SELECT *
+        FROM Pages
+    """).fetchall()
+
+    if not pageEntries:
+        cur.executemany("""
+            INSERT INTO Pages (Name, ViewCount)
+            VALUES (?, ?)
+        """, pages)
         conn.commit()
