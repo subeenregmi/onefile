@@ -21,7 +21,7 @@ class TestConfig:
         assert self.file1["secret_key"] == secret
 
     def test_load_four(self):
-        assert len(self.file1) == 3
+        assert len(self.file1) == 4
 
     def test_secret_generation_one(self):
         assert self.file2["secret_key"]
