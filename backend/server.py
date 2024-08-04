@@ -136,7 +136,7 @@ def dashboard():
     match privilege:
         case "1":
             app.logger.info(f"Admin '{username}' has successfully logged in.")
-            return render_template("adminpage.html")
+            return render_template("adminpage.html", host=config["host"])
         case "2":
             app.logger.info(
                 f"Uploader '{username}' has successfully logged in."
@@ -144,7 +144,8 @@ def dashboard():
             return render_template("uploadpage.html")
         case "3":
             app.logger.info(f"Viewer '{username}' has successfully logged in.")
-            return render_template("loginpage.html", username=username)
+            return render_template("loginpage.html", username=username,
+                                   host=config["host"])
         case _:
             app.logger.warning(
                 f"User '{username}' has tried to login with unknown privilege."
@@ -350,7 +351,7 @@ def main():
 
     app.logger.info("="*50)
     app.logger.info("Starting app...")
-    app.run(host="0.0.0.0")
+    app.run(host=config["host"])
 
 
 if __name__ == "__main__":

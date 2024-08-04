@@ -2,6 +2,20 @@
 <html>
     <head>
         <script src="{{url_for('static', filename='scripts/admin.js')}}"></script>
+        <script>
+            function helperFunc1(){
+                return displayFileStats("{{host}}");
+            }
+            function helperFunc2(){
+                return displayUsers("{{host}}");
+            }
+            function helperFunc3(){
+                return displayPageData("{{host}}");
+            }
+            document.addEventListener('DOMContentLoaded', helperFunc1);
+            document.addEventListener('DOMContentLoaded', helperFunc2);
+            document.addEventListener('DOMContentLoaded', helperFunc3);
+        </script>
     </head>
     <body>
         <h1> Admin Page</h1>

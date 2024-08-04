@@ -1,6 +1,6 @@
-function displayFileStats() {
+function displayFileStats(host) {
     let container = document.getElementById("files")
-    fetch ("http://192.168.0.200:5000/api/file/all?cols=FileName&cols=DownloadCount")
+    fetch ("http://" + host + ":5000/api/file/all?cols=FileName&cols=DownloadCount")
         .then (response => {
             if (response.ok) {
                 return response.json();
@@ -23,11 +23,10 @@ function displayFileStats() {
         })
 }
 
-document.addEventListener('DOMContentLoaded', displayFileStats);
 
-function displayUsers(){
+function displayUsers(host){
     let container = document.getElementById("users");
-    fetch ("http://192.168.0.200:5000/api/user/search/all?cols=Username&cols=ID")
+    fetch ("http://" + host + ":5000/api/user/search/all?cols=Username&cols=ID")
         .then (response => {
             if (response.ok) {
                 return response.json();
@@ -48,12 +47,10 @@ function displayUsers(){
         })
 }
 
-document.addEventListener('DOMContentLoaded', displayUsers);
 
-
-function displayPageData() {
+function displayPageData(host) {
     let container = document.getElementById("page-data")
-    fetch ("http://192.168.0.200:5000/api/pages/all?cols=Name&cols=ViewCount")
+    fetch ("http://" + host + ":5000/api/pages/all?cols=Name&cols=ViewCount")
         .then (response => {
             if (response.ok) {
                 return response.json();
@@ -73,5 +70,3 @@ function displayPageData() {
            console.error(error);
         })
 }
-
-document.addEventListener('DOMContentLoaded', displayPageData);

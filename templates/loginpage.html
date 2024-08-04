@@ -2,6 +2,12 @@
 <html>
     <head>
         <script src="{{url_for('static', filename='scripts/login.js')}}"></script>
+        <script>
+            function helperFunc(){
+                return createDownloadLinks("{{ host }}")
+            }
+            document.addEventListener('DOMContentLoaded', helperFunc);
+        </script>
     </head>
     <body>
         <p>

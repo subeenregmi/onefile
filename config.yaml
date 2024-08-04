@@ -1,3 +1,4 @@
 database: onefile.db
 loginRequired: true 
 secret_key: 7e6dac2a942ba1d025171d1d7d9b9719e003a6c85f599d8a1b0c2fa7d8899af1
+host: 192.168.0.200

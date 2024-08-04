@@ -1,5 +1,6 @@
 import yaml
 import secrets
+import socket
 
 
 def getConfig(filename: str) -> dict[str, str]:
@@ -16,11 +17,12 @@ def getConfig(filename: str) -> dict[str, str]:
         data = yaml.load(f, yaml.Loader)
 
     data = checkSecret(data)
+    data = checkHost(data)
 
     return data
 
 
-def checkSecret(data: dict[str, str]):
+def checkSecret(data: dict[str, str]) -> dict[str, str]:
     """ Checks if secret is present in data, if not it will generate it
 
     Args:
@@ -31,5 +33,21 @@ def checkSecret(data: dict[str, str]):
     """
     if "secret_key" not in data or data["secret_key"] is None:
         data["secret_key"] = secrets.token_hex()
+
+    return data
+
+
+def checkHost(data: dict[str, str]) -> dict[str, str]:
+    """ Checks if host is present in data, if not will use localhost
+
+    Args:
+        data: The current yaml file in dictionary value
+
+    Returns:
+        The 'data' dictionary with the host
+    """
+
+    if "host" not in data or data["host"] is None:
+        data["host"] = "localhost"
 
     return data
