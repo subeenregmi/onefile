@@ -26,7 +26,7 @@ def checkSecret(data: dict[str, str]) -> dict[str, str]:
     """ Checks if secret is present in data, if not it will generate it
 
     Args:
-        data: The current yaml file in dictionary value
+        data: The current yaml file as a dictionary
 
     Returns:
         The 'data' dictionary with the secret_key
@@ -41,7 +41,7 @@ def checkHost(data: dict[str, str]) -> dict[str, str]:
     """ Checks if host is present in data, if not will use localhost
 
     Args:
-        data: The current yaml file in dictionary value
+        data: The current yaml file as a dictionary
 
     Returns:
         The 'data' dictionary with the host
@@ -53,9 +53,19 @@ def checkHost(data: dict[str, str]) -> dict[str, str]:
     return data
 
 
-def checkRefreshFiles(data):
+def checkRefreshFiles(data: dict[str, str]) -> dict[str, str]:
+    """ Checks if refresh_files is present in the config file, if
+    not will user 300 seconds or 5 minutes.
+
+    Args:
+        data: The current yaml file as a dictionary
+
+    Returns:
+        The 'data' dictionary with the refreshfile value
+
+    """
+
     if "refresh_files" not in data or data["refresh_files"] is None:
         data["host"] = 300
 
     return data
-

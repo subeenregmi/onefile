@@ -3,7 +3,6 @@ import os
 from database_utils import getTableColumns, initFiles
 
 
-
 def getUserData(
     conn: sqlite3.Connection,
     username: str = "",
@@ -184,15 +183,23 @@ def removeFileHistory(conn: sqlite3.Connection, filename: str):
 
 
 def refreshFiles(conn: sqlite3.Connection):
+    """ Refreshes files on the database with the files in the
+    shared_files directory.
+
+    Args:
+        conn: A sqlite3 connection object connected to the database
+
+    Returns:
+        None
+    """
     initFiles(conn, "shared_files/")
 
     filesInDB = [x["FileName"] for x in getFileData(conn, "", "FileName")]
     filesInDir = os.listdir(os.path.join(
         os.path.dirname(__file__), "..", "shared_files/"
     ))
-    filesToDelete = set(filesInDB) - set(filesInDir)
 
-    print(filesToDelete)
+    filesToDelete = set(filesInDB) - set(filesInDir)
 
     for file in filesToDelete:
         removeFileHistory(conn, file)

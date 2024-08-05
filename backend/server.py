@@ -346,6 +346,7 @@ def retrievePageData(pageName: str):
 def main():
     app.debug = True
 
+    # Add timed job to refresh files
     scheduler = APScheduler()
     scheduler.add_job(
         "refreshfiles",

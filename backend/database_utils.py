@@ -55,7 +55,7 @@ def createDefaultUser(conn: sqlite3.Connection):
 
 
 def initFiles(conn: sqlite3.Connection, filedir: str):
-    """ Creates a file in entry for all the files in the 'shared_files'
+    """ Creates a file database entry for all files in the 'shared_files'
     directory.
 
     Args:
@@ -69,10 +69,13 @@ def initFiles(conn: sqlite3.Connection, filedir: str):
     files = [(x, 0) for x in files]
 
     cur = conn.cursor()
+
     for file in files:
-        if cur.execute(
-            f"SELECT * FROM Files WHERE FileName = '{file[0]}';"
-        ).fetchone() is None:
+        if not (
+            cur.execute(
+                f"SELECT * FROM Files WHERE FileName = '{file[0]}';"
+            ).fetchone()
+        ):
             cur.execute(f"""
                 INSERT INTO Files (FileName, DownloadCount, UploadDate)
                 VALUES ('{file[0]}', 0, DATETIME('now'))
