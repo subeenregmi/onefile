@@ -1,5 +1,7 @@
 import sqlite3
-from database_utils import getTableColumns
+import os
+from database_utils import getTableColumns, initFiles
+
 
 
 def getUserData(
@@ -179,6 +181,22 @@ def removeFileHistory(conn: sqlite3.Connection, filename: str):
         WHERE FileID = {fileID}
     """)
     conn.commit()
+
+
+def refreshFiles(conn: sqlite3.Connection):
+    initFiles(conn, "shared_files/")
+
+    filesInDB = [x["FileName"] for x in getFileData(conn, "", "FileName")]
+    filesInDir = os.listdir(os.path.join(
+        os.path.dirname(__file__), "..", "shared_files/"
+    ))
+    filesToDelete = set(filesInDB) - set(filesInDir)
+
+    print(filesToDelete)
+
+    for file in filesToDelete:
+        removeFileHistory(conn, file)
+        removeFile(conn, file)
 
 
 def addDownloadTransaction(

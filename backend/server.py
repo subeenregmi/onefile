@@ -2,15 +2,16 @@ from flask import (
     Flask, render_template, request, send_from_directory, make_response,
     redirect, url_for, session
 )
+from flask_apscheduler import APScheduler
 from werkzeug.utils import secure_filename
 from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
     incrementDownloadCount, getFileStatistics, createUser, removeUser,
     removeFileHistory, addPageVisit, incrementPageVisits, getPageData,
-    getPageVisitsData
+    getPageVisitsData, refreshFiles
 )
 from database_utils import (
-    setupDatabase, createAnonUser
+    setupDatabase, createAnonUser, initFiles
 )
 from bcrypt import hashpw, checkpw, gensalt
 from config import getConfig
@@ -344,6 +345,16 @@ def retrievePageData(pageName: str):
 
 def main():
     app.debug = True
+
+    scheduler = APScheduler()
+    scheduler.add_job(
+        "refreshfiles",
+        func=refreshFiles,
+        args=[db_conn],
+        trigger="interval",
+        seconds=config["refresh_files"]
+    )
+    scheduler.start()
 
     if not config['loginRequired']:
         app.logger.info("Anonymous user has been created.")

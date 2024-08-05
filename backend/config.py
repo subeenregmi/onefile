@@ -51,3 +51,11 @@ def checkHost(data: dict[str, str]) -> dict[str, str]:
         data["host"] = "localhost"
 
     return data
+
+
+def checkRefreshFiles(data):
+    if "refresh_files" not in data or data["refresh_files"] is None:
+        data["host"] = 300
+
+    return data
+
