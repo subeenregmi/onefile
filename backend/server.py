@@ -11,11 +11,13 @@ from database_queries import (
     getPageVisitsData, refreshFiles
 )
 from database_utils import (
-    setupDatabase, createAnonUser, initFiles
+    setupDatabase, createAnonUser
 )
 from bcrypt import hashpw, checkpw, gensalt
 from config import getConfig
 from logging.config import dictConfig
+import hashlib
+import os
 
 
 dictConfig(
@@ -341,6 +343,35 @@ def retrievePageData(pageName: str):
 
     columns = request.args.to_dict(flat=False)['cols']
     return getPageData(db_conn, pageName, *columns)
+
+
+@app.route("/api/file/hash/<filename>")
+def getHash(filename: str):
+    """ Retrieves the hash of a file in the shared_files directory. """
+
+    app.logger.info(f"Retrieving hash for {filename}.")
+    pathToFile = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "shared_files/",
+        secure_filename(filename)
+    )
+
+    if not os.path.isfile(pathToFile):
+        return "Not a file"
+
+    sha_hash = hashlib.sha256()
+
+    bufferSize = 65536  # 64KB
+
+    with open(pathToFile, "rb") as f:
+        while True:
+            data = f.read(bufferSize)
+            if not data:
+                break
+            sha_hash.update(data)
+
+    return sha_hash.hexdigest()
 
 
 def main():
