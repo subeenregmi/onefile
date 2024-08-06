@@ -78,7 +78,7 @@ def initFiles(conn: sqlite3.Connection, filedir: str):
         ):
             cur.execute(f"""
                 INSERT INTO Files (FileName, DownloadCount, UploadDate)
-                VALUES ('{file[0]}', 0, DATETIME('now'))
+                VALUES ('{file[0]}', 0, DATETIME('now', 'localtime'))
             """)
             conn.commit()
 

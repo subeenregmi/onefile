@@ -114,7 +114,7 @@ def addFile(conn: sqlite3.Connection, filename: str):
     cur = conn.cursor()
     cur.execute(f"""
         INSERT INTO Files (FileName, DownloadCount, UploadDate)
-        VALUES ('{filename}', 0, DATETIME('now'));
+        VALUES ('{filename}', 0, DATETIME('now', 'localtime'));
     """)
     conn.commit()
 
@@ -225,7 +225,7 @@ def addDownloadTransaction(
     cur = conn.cursor()
     cur.execute(f"""
         INSERT INTO DownloadHistory (UserID, FileID, Timestamp)
-        VALUES ('{userID}', '{fileID}', DATETIME('now'))
+        VALUES ('{userID}', '{fileID}', DATETIME('now', 'localtime'))
     """)
     conn.commit()
 
@@ -346,7 +346,9 @@ def addPageVisit(
 
     cur.execute(f"""
         INSERT INTO PageVisits (PageID, UserID, IpAddress, Timestamp)
-        VALUES ({pageID}, {userID or "NULL"}, '{ipAddress}', DATETIME('now'))
+        VALUES (
+        {pageID}, {userID or "NULL"}, '{ipAddress}',
+        DATETIME('now', 'localtime'))
     """)
     conn.commit()
 
