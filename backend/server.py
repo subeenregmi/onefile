@@ -63,6 +63,7 @@ app = Flask(__name__,
 app.secret_key = config['secret_key']
 
 db_conn = setupDatabase(config['database'])
+fileHashes = dict()
 
 
 @app.route("/")
@@ -350,6 +351,10 @@ def getHash(filename: str):
     """ Retrieves the hash of a file in the shared_files directory. """
 
     app.logger.info(f"Retrieving hash for {filename}.")
+
+    if cacheResult := fileHashes.get(filename):
+        return cacheResult
+
     pathToFile = os.path.join(
         os.path.dirname(__file__),
         "..",
@@ -371,7 +376,8 @@ def getHash(filename: str):
                 break
             sha_hash.update(data)
 
-    return sha_hash.hexdigest()
+    fileHashes[filename] = sha_hash.hexdigest()
+    return fileHashes[filename]
 
 
 def main():
