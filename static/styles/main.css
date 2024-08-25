@@ -5,48 +5,30 @@
 
 
 * {
-    margin: 0px;
-    padding: 0px;
+    font-family: 'SF-Pro';
+    font-size: 26px;
 }
 
 body {
-    font-family: 'SF-Pro';
-    background-color: #343633;
-}
-
-.topbar {
-    color: white;
-    border-bottom: 2px solid white;
-    margin: 0px 20px;
-    text-align: center;
-    padding-bottom: 10px;
-}
-
-.topbar h1 {
-    font-family: "Playwrite NO", cursive, sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 48px;
-    text-shadow: 0px 0px 10px #7cc6fe;
-}
-
-
-div.login {
-    width: 30%;
-    height: 60vh;
-    margin: auto;
-    border: 3px solid white;
+    margin: 0px;
+    padding: 0px;
+    height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    background-color: #FAF9F6;
 }
 
-.login form {
+form {
     display: flex;
     flex-direction: column;
+    width: 300px;
 }
 
-.login input {
-    margin: 20px;
+input { 
+    padding: 5px;
+    margin: 3px;
+    border: 2px solid black;
+    border-radius: 5px;
 }
+
