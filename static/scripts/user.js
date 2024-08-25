@@ -23,13 +23,15 @@ async function initialiseFiles(host) {
             let file = files[i];
             let newFile = new OneFile(
                 file["FileName"],
-                0,
+                await fetch(`http://${host}/${hashAPI}/${file["FileName"]}`),
                 `http://${host}/${downloadFileAPI}/${file["FileName"]}`,
                 file["DownloadCount"],
                 file["UploadDate"]
             )
             oneFilesList.push(newFile); 
         }
+
+
     }
     catch (err) {
         console.log(err);
