@@ -185,7 +185,7 @@ def createPageEntries(conn: sqlite3.Connection):
         None
     """
     pages = [
-        ("home", 0),
+        ("login", 0),
         ("dashboard", 0)
     ]
     cur = conn.cursor()

@@ -69,8 +69,8 @@ fileHashes = dict()
 @app.route("/")
 def home():
     """ The login page users have to use to login to the app """
-    incrementPageVisits(db_conn, "home")
-    addPageVisit(db_conn, "home", None, request.remote_addr)
+    incrementPageVisits(db_conn, "login")
+    addPageVisit(db_conn, "login", None, request.remote_addr)
 
     if config['loginRequired']:
         return render_template("loginpage.html")
@@ -233,6 +233,10 @@ def getFile(filename):
     app.logger.debug(
         f"File information for '{filename or "*"}' is being retrieved."
     )
+
+    if columns == ["all"]:
+        columns = []
+
     return getFileData(db_conn, filename, *columns)
 
 

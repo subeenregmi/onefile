@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="{{url_for('static', filename='scripts/login.js')}}"></script>
+        <script src="{{url_for('static', filename='scripts/user.js')}}"></script>
         <script>
-            function helperFunc(){
-                return createDownloadLinks("{{ host }}")
-            }
-            document.addEventListener('DOMContentLoaded', helperFunc);
+                // ("{{ host }}")
         </script>
+        <link rel="stylesheet" href="{{url_for('static', filename='styles/user.css')}}">
     </head>
     <body>
-        <p>
-            Hello {{ username }}
-        </p>
+        <header>
+            <h1>Onefile</h1>
+        </header>
+        <h2> Welcome <span>{{username}}</span> !</h2>
+        <h3> Shared files:</h2>
         <div id="files">
+
         </div>
     </body>
 </html>

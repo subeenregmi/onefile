@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'SF-Pro';
+    src: url('fonts/SF-Pro-Display-Regular.otf')
+}
+
+* {
+    font-family: 'SF-Pro';
+}
+
+h1 {
+    font-size: 60px;
+    margin: 1% 2%
+}
+
+header {
+    border-bottom: 2px solid black;
+}
+
+h2 {
+    font-size: 40px;
+    margin: 1%;
+}
+
+h3 {
+    font-size: 30px;
+    margin: 1%;
+}
+
+span {
+    color: dodgerblue;
+    font-style: italic;
+}
