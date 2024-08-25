@@ -73,7 +73,7 @@ def home():
     addPageVisit(db_conn, "home", None, request.remote_addr)
 
     if config['loginRequired']:
-        return render_template("homepage.html")
+        return render_template("loginpage.html")
     else:
         app.logger.info("Anonymous user logged in.")
         session['username'] = "Anonymous"
@@ -96,13 +96,13 @@ def login():
         app.logger.info(
             f"User '{username}' tried to login, but does not exist."
         )
-        return render_template("homepage.html")
+        return redirect(url_for('home'))
 
     user = user[0]
 
     if not checkpw(password, user['PassHash'].encode("UTF-8")):
         app.logger.info(f"User '{username}' login failed.")
-        return render_template("homepage.html")
+        return render_template("loginpage.html")
 
     session["username"] = user['Username']
     session["privilege"] = str(user['Privilege'])
@@ -148,7 +148,7 @@ def dashboard():
             return render_template("uploadpage.html")
         case "3":
             app.logger.info(f"Viewer '{username}' has successfully logged in.")
-            return render_template("loginpage.html", username=username,
+            return render_template("userpage.html", username=username,
                                    host=config["host"])
         case _:
             app.logger.warning(
