@@ -45,6 +45,9 @@ function createIcon(host, file) {
 
     container.classList.add("file-container");
     let fileExtension = file.name.split(".").at(-1);
+    if (fileExtension == undefined) {
+        fileExtension = "txt";
+    }
     image.src = `http://${host}/static/images/${fileExtension}_file_icon.png`;
     paragraph.innerHTML = file.name;
     a.href = file.downloadLink;

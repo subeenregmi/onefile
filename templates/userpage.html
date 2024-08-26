@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="{{url_for('static', filename='scripts/user.js')}}"></script>
         <script>
                 // ("{{ host }}")
@@ -9,7 +10,11 @@
     </head>
     <body>
         <header>
-            <h1>Onefile</h1>
+            <h1>Onefile
+                <a href="{{ "http://" + host + ":5000" }}">
+                    <button class="logout">Logout</button>
+                </a>
+            </h1>
         </header>
         <h2> Welcome <span>{{username}}</span> !</h2>
         <h3> Shared files:</h2>
