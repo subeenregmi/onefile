@@ -44,7 +44,8 @@ function createIcon(host, file) {
     let paragraph = document.createElement("p");
 
     container.classList.add("file-container");
-    image.src = `http://${host}/static/images/txt_file_icon.png`;
+    let fileExtension = file.name.split(".").at(-1);
+    image.src = `http://${host}/static/images/${fileExtension}_file_icon.png`;
     paragraph.innerHTML = file.name;
     a.href = file.downloadLink;
 
