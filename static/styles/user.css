@@ -5,11 +5,17 @@
 
 * {
     font-family: 'SF-Pro';
+    margin: 0;
+    padding: 0;
+}
+
+body {
+   height: 100vh; 
 }
 
 h1 {
     font-size: 60px;
-    margin: 1% 2%
+    padding: 1% 2%
 }
 
 header {
@@ -29,4 +35,39 @@ h3 {
 span {
     color: dodgerblue;
     font-style: italic;
+}
+
+#files {
+    display: flex;
+    max-width: 80%;
+    max-height: 60%;
+    width: fit-content;
+    height: fit-content;
+
+    margin: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    border: 5px solid black;
+    border-radius: 10px;
+    overflow: auto;
+}
+
+div.file-container {
+    width: 125px;
+    height: 150px;
+    color: black;
+    text-align: center;
+    font-size: 18px;
+    margin: 5px;
+    overflow-wrap: break-word;
+}
+
+div.file-container img {
+    width: 100%;
+    margin: auto;
+}
+
+div.file-container a:hover {
+    filter: brightness(75%);
+    color: gray;
 }

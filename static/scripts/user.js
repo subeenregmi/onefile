@@ -1,4 +1,3 @@
-const oneFilesList = [];
 const hashAPI = "api/file/hash";
 const fileAPI = "api/file";
 const downloadFileAPI = "api/download"
@@ -15,6 +14,7 @@ class OneFile {
 
 
 async function initialiseFiles(host) {
+    let oneFilesList = [];
     try {
         let files = await fetch(`http://${host}/${fileAPI}/all?cols=all`);
         files = await files.json();
@@ -30,12 +30,40 @@ async function initialiseFiles(host) {
             )
             oneFilesList.push(newFile); 
         }
-
-
+        return oneFilesList;
     }
     catch (err) {
         console.log(err);
     }
 }
 
-initialiseFiles("192.168.200:5000");
+function createIcon(host, file) {
+    let container = document.createElement("div");
+    let a = document.createElement("a");
+    let image = document.createElement("img");
+    let paragraph = document.createElement("p");
+
+    container.classList.add("file-container");
+    image.src = `http://${host}/static/images/txt_file_icon.png`;
+    paragraph.innerHTML = file.name;
+    a.href = file.downloadLink;
+
+    a.appendChild(image);
+    a.appendChild(paragraph);
+    container.appendChild(a);
+
+    return container;
+}
+
+async function displayFiles(host) {
+    let oneFilesList = await initialiseFiles(host);
+    let container = document.getElementById("files");
+    for (let i = 0; i < oneFilesList.length; i++) {
+        let fileIcon = createIcon(host, oneFilesList[i]);
+        container.appendChild(fileIcon);
+    }
+}
+
+displayFiles("192.168.0.200:5000");
+
+
