@@ -1,0 +1,48 @@
+@font-face {
+    font-family: 'SF-Pro';
+    src: url('fonts/SF-Pro-Display-Regular.otf')
+}
+
+* {
+    font-family: 'SF-Pro';
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+}
+
+h1 {
+    font-size: 60px;
+    padding: 1% 2%
+}
+
+header {
+    border-bottom: 2px solid black;
+}
+
+.nav-button {
+    background-color: transparent;
+    border: 0;
+    font-size: 24px;
+    margin: 0px 10px 10px 20px;
+    text-decoration: underline transparent solid 2px;
+    transition: text-decoration-color 0.185s ease-in-out;
+}
+
+.nav-button:hover {
+    text-decoration-color: black;
+}
+
+h2 {
+    font-size: 30px;
+    margin: 1% 1%;
+}
+
+div.summary {
+    height: 70%;
+    margin: 10px 40px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px gray;
+}

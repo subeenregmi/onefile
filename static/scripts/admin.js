@@ -1,72 +1,43 @@
-function displayFileStats(host) {
-    let container = document.getElementById("files")
-    fetch ("http://" + host + ":5000/api/file/all?cols=FileName&cols=DownloadCount")
-        .then (response => {
-            if (response.ok) {
-                return response.json();
-            }
-            else {
-                throw new Error("API request failed");
-            }
-        })
-        .then (data => {
-            console.log(data);
-            console.log(data[0]);
-            for (let file in data) {
-                let paragraph = document.createElement("p");
-                paragraph.innerText = data[file]['FileName'] + ": " + data[file]['DownloadCount'];
-                container.appendChild(paragraph);
-            }
-        })
-        .catch (error => {
-           console.error(error);
-        })
+import Chart from "chart.js/auto";
+
+const fileAPI       = "api/file";
+const fileStatsAPI  = "api/file/stats";
+const addUserAPI    = "api/user/create";
+const deleteUserAPI = "api/user/delete";
+const userAPI       = "api/user/search";
+const pageViewAPI   = "api/pages/history";
+const pageStatsAPI  = "api/pages"
+
+
+async function createDownloadSummary(host) {
+    let files = await fetch(`http://${host}/${fileAPI}/all?cols=all`);
+    files = await files.json();
 }
 
 
-function displayUsers(host){
-    let container = document.getElementById("users");
-    fetch ("http://" + host + ":5000/api/user/search/all?cols=Username&cols=ID")
-        .then (response => {
-            if (response.ok) {
-                return response.json();
+async function quickSummary(host) {
+    createDownloadSummary(host)
+    const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+          datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
             }
-            else {
-                throw new Error("API request failed.");
-            }
-        })
-        .then (data => {
-            for (let user in data){
-                let paragraph = document.createElement("p");
-                paragraph.innerText = data[user]['ID'] + " " + data[user]['Username'];
-                container.appendChild(paragraph);
-            }
-        })
-        .catch (error => {
-            console.error(error);
-        })
+          }
+        }
+      });
 }
 
 
-function displayPageData(host) {
-    let container = document.getElementById("page-data")
-    fetch ("http://" + host + ":5000/api/pages/all?cols=Name&cols=ViewCount")
-        .then (response => {
-            if (response.ok) {
-                return response.json();
-            }
-            else {
-                throw new Error("API request failed");
-            }
-        })
-        .then (data => {
-            for (let page in data) {
-                let paragraph = document.createElement("p");
-                paragraph.innerText = data[page]['Name'] + ": " + data[page]['ViewCount'];
-                container.appendChild(paragraph);
-            }
-        })
-        .catch (error => {
-           console.error(error);
-        })
-}
+quickSummary("192.168.0.200:5000")

@@ -1,81 +1,25 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="{{url_for('static', filename='scripts/admin.js')}}"></script>
-        <script>
-            function helperFunc1(){
-                return displayFileStats("{{host}}");
-            }
-            function helperFunc2(){
-                return displayUsers("{{host}}");
-            }
-            function helperFunc3(){
-                return displayPageData("{{host}}");
-            }
-            document.addEventListener('DOMContentLoaded', helperFunc1);
-            document.addEventListener('DOMContentLoaded', helperFunc2);
-            document.addEventListener('DOMContentLoaded', helperFunc3);
-        </script>
+        <script src="{{url_for('static', filename='dist/admin.js')}}" type="module"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='styles/admin.css')}}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
-        <h1> Admin Page</h1>
-        <h3> Download Summary </h3>
-        <div id="files">
+        <header>
+            <h1>Onefile</h1>
+            <nav class="nav-container">
+                <button class="nav-button">Files</button>
+                <button class="nav-button">Users</button>
+                <button class="nav-button">Stats</button>
+                <button class="nav-button" style="float: right">Logout</button>
+                <button class="nav-button" style="float: right">Settings</button>
+            </nav>
+        </header>
+        <h2>Quick Summary</h2>
+        <div class="summary">
+            <canvas id="myChart">
+            </canvas>
         </div>
-        <h3> Upload new file </h3>
-        <form enctype="multipart/form-data" action="{{url_for('uploadFile')}}"
-              method="post">
-            <label for="fname"> File name: </label>
-            <input type="text" id="fname" name="filename"><br>
-
-            <label for="fileselector"> Select the file: </label>
-            <input type="file" name="file"><br>
-            <input type="submit" value="Submit">
-        </form>
-        <h3> Delete file </h3>
-        <form action="{{url_for('deleteFile')}}" method="post">
-            <label for="filename"> File Name: </label>
-            <input type="text" id="filename" name="filename">
-            <input type="submit" value="Submit">
-        </form>
-        <h3> Search file stats </h3>
-        <form action="{{url_for('getFileStats')}}" method="post">
-            <label for="filename1"> File Name: </label>
-            <input type="text" id="filename1" name="filename">
-            <input type="submit" value="Submit">
-        </form>
-        <h3> Create new user </h3>
-        <form action="{{url_for('addUser')}}" method="post">
-            <label for="username"> Username: </label>
-            <input type="text" id="username" name="username"><br>
-            <label for="passhash"> Password: </label>
-            <input type="password" id="passhash" name="passhash"><br>
-            <label for="priv"> Privilege: </label>
-            <select id="priv" name="privilege">
-                <option value="1">Admin</option>
-                <option value="2">Uploader</option>
-                <option value="3">Viewer</option>
-            </select><br>
-            <input type="submit" value="Submit">
-        </form>
-        <h3> Delete user </h3>
-        <div id="users">
-            <p><b>ID, Username</b></p>
-        </div>
-        <form action="{{url_for('deleteUser')}}" method="post">
-            <label for="username1"> Username: </label>
-            <input type="text" id="username1" name="username">
-            <input type="submit" value="Submit">
-        </form>
-        <h3> Page stats </h3>
-        <div id="page-data">
-        </div>
-        <h3> Search page stats </h3>
-        <form action="{{url_for('getPageStats')}}" method="post">
-            <label for="pagename"> Page Name: </label>
-            <input type="text" id="pagename" name="pagename">
-            <input type="submit" value="Submit">
-        </form>
-
     </body>
 </html>
