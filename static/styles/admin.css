@@ -40,9 +40,47 @@ h2 {
     margin: 1% 1%;
 }
 
-div.summary {
+.container {
     height: 70%;
-    margin: 10px 40px;
+    width: 95%;
+    margin: auto;
     border-radius: 10px;
     box-shadow: 0px 0px 10px gray;
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-template-rows: 25% 25% 25% 25%;
 }
+
+.stat {
+    text-align: center;
+    font-size: 20px;
+    padding: 10px;
+    border: 1px solid black;
+}
+
+.stat canvas {
+    margin: auto;
+    height: 90%;
+}
+
+.stat table {
+    margin: auto;
+    width: 90%;
+    text-align: center;
+    text-align: center;
+    border-spacing: 0;
+}
+
+.stat th {
+    width: 50%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.stat td:first-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.stat th:first-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+

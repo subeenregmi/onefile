@@ -1,43 +1,127 @@
 import Chart from "chart.js/auto";
+import { Colors } from "chart.js";
 
-const fileAPI       = "api/file";
-const fileStatsAPI  = "api/file/stats";
-const addUserAPI    = "api/user/create";
-const deleteUserAPI = "api/user/delete";
-const userAPI       = "api/user/search";
-const pageViewAPI   = "api/pages/history";
-const pageStatsAPI  = "api/pages"
+const fileAPI           = "api/file";
+const fileStatsAPI      = "api/file/stats";
+const addUserAPI        = "api/user/create";
+const deleteUserAPI     = "api/user/delete";
+const userAPI           = "api/user/search";
+const pageViewTransAPI  = "api/pages/history";
+const pageViewsAPI      = "api/pages";
 
+async function createDownloadSummary(files) {
+    
+    new Chart (
+        document.getElementById("chart1"),
+        {
+            type: 'bar',
+            data: {
+                labels: files.map(file => file.FileName),
+                datasets: [
+                    {
+                        label: "Download Summary",
+                        data: files.map(file => file.DownloadCount),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.2)',
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                        ],
+                        borderWidth: 1,
+                    }
+                ]
+            },
+        }
+    )
+}
 
-async function createDownloadSummary(host) {
-    let files = await fetch(`http://${host}/${fileAPI}/all?cols=all`);
-    files = await files.json();
+async function createPageViewStats(pageViews) {
+    let table = document.getElementById("pageviews-sum");
+    let tableRow = document.createElement("tr");
+    
+    let headings = ["Page", "View count"];
+    for (let i = 0; i < headings.length; i++) {
+        let tableHeading = document.createElement("th");
+        tableHeading.innerHTML = headings[i];
+        tableRow.appendChild(tableHeading);
+    }
+
+    table.appendChild(tableRow);
+
+    for (let i = 0; i < pageViews.length; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerHTML = pageViews[i].Name;
+
+        let td2 = document.createElement("td");
+        td2.innerHTML = pageViews[i].ViewCount;
+
+        tr.appendChild(td);
+        tr.appendChild(td2);
+        table.appendChild(tr);
+    }
+}
+
+async function createUsersSummary(users) {
+    let table = document.getElementById("users-sum");
+    let tableRow = document.createElement("tr");
+    
+    let headings = ["Username", "Privilege"];
+    for (let i = 0; i < headings.length; i++) {
+        let tableHeading = document.createElement("th");
+        tableHeading.innerHTML = headings[i];
+        tableRow.appendChild(tableHeading);
+    }
+
+    table.appendChild(tableRow);
+
+    for (let i = 0; i < users.length; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerHTML = users[i].Username;
+
+        let td2 = document.createElement("td");
+        td2.innerHTML = translatePrivilege(users[i].Privilege);
+
+        tr.appendChild(td);
+        tr.appendChild(td2);
+        table.appendChild(tr);
+    }
+}
+
+function translatePrivilege(num){
+    switch (num) {
+        case 1:
+            return "Admin";
+        case 2:
+            return "Uploader";
+        case 3:
+            return "User";
+        default:
+            return "Anon";
+    }
 }
 
 
 async function quickSummary(host) {
-    createDownloadSummary(host)
-    const ctx = document.getElementById('myChart');
+    let files = await fetch(`http://${host}/${fileAPI}/all?cols=all`);
+    files = await files.json();
 
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-          datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
+    await createDownloadSummary(files)
+
+    let pageViews = await fetch(`http://${host}/${pageViewsAPI}/all?cols=all`);
+    pageViews = await pageViews.json();
+
+    await createPageViewStats(pageViews);
+
+    let users = await fetch(`http://${host}/${userAPI}/all?cols=all`)
+    users = await users.json()
+
+    console.log(users);
+
+    await createUsersSummary(users);
 }
 
-
-quickSummary("192.168.0.200:5000")
+quickSummary("192.168.0.200:5000");

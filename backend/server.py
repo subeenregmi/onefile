@@ -324,6 +324,9 @@ def getUser(username: str):
 
     columns = request.args.to_dict(flat=False)['cols']
 
+    if columns == ["all"]:
+        columns = ""
+
     app.logger.debug(f"User data for '{username or "*"}' has been retrieved.")
     return getUserData(db_conn, username, "", *columns)
 
@@ -347,6 +350,9 @@ def retrievePageData(pageName: str):
         pageName = ""
 
     columns = request.args.to_dict(flat=False)['cols']
+    if columns == ["all"]:
+        columns = ""
+
     return getPageData(db_conn, pageName, *columns)
 
 
