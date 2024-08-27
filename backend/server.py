@@ -38,7 +38,7 @@ dictConfig(
             },
             "file": {
                 "class": "logging.handlers.RotatingFileHandler",
-                "filename": "server.log",
+                "filename": "logs/server.log",
                 "maxBytes": 5000000,
                 "backupCount": 5,
                 "formatter": "default"
