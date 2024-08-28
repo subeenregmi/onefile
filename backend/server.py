@@ -96,13 +96,13 @@ def login():
         app.logger.info(
             f"User '{username}' tried to login, but does not exist."
         )
-        return redirect(url_for('home'))
+        return redirect(url_for("home"), 403)
 
     user = user[0]
 
     if not checkpw(password, user["PassHash"].encode("UTF-8")):
         app.logger.info(f"User '{username}' login failed.")
-        return render_template("loginpage.html")
+        return redirect(url_for("home"), 403)
 
     session["username"] = user["Username"]
     session["privilege"] = str(user["Privilege"])
@@ -162,6 +162,7 @@ def uploadFile():
     """ Api route to upload a file, needs to be sent through post
     form data.
     """
+    # TODO: make more appropriate response
 
     username = session.get("username")
     privilege = session.get("privilege")
@@ -196,6 +197,7 @@ def uploadFile():
     addFile(db_conn, filename)
 
     app.logger.info(f"User {username} has added a new file: '{filename}'.")
+
     return "The file has been successfully added"
 
 
@@ -214,7 +216,8 @@ def deleteFile():
             " permissions.")
         return "You need to be an admin or an uploader to upload files"
 
-    filename = request.form["filename"]
+    filename = request.json["filename"]
+
     removeFileHistory(db_conn, filename)
     removeFile(db_conn, filename)
 
@@ -226,7 +229,7 @@ def deleteFile():
 def getFile(filename):
     """ Api route to get file data. """
 
-    columns = request.args.to_dict(flat=False)['cols']
+    columns = request.args.to_dict(flat=False)["cols"]
     if filename == "all":
         filename = ""
 
@@ -253,7 +256,7 @@ def downloadFile(filename: str):
     username = session.get("username")
     userID = session.get("user_id")
 
-    addDownloadTransaction(db_conn, userID, file[0]['ID'])
+    addDownloadTransaction(db_conn, userID, file[0]["ID"])
     incrementDownloadCount(db_conn, filename)
 
     app.logger.info(f"User {username} has downloaded {filename}.")
@@ -262,12 +265,12 @@ def downloadFile(filename: str):
 
 @app.route("/api/file/stats", methods=["POST"])
 def getFileStats():
-    """ Api route to retrieve file download history.  """
+    """ Api route to retrieve file download history."""
 
     app.logger.debug(
-        f"File statistics for '{request.form['filename']}' retrieved."
+        f"File statistics for '{request.json["filename"]}' retrieved."
     )
-    return getFileStatistics(db_conn, request.form['filename'])
+    return getFileStatistics(db_conn, request.json["filename"])
 
 
 @app.route("/api/user/create", methods=["POST"])
@@ -276,6 +279,8 @@ def addUser():
     privilege = session.get("privilege")
     username = session.get("username")
 
+    # TODO: more appropriate responses
+
     if (privilege != "1"):
         app.logger.warning(
             f"User '{username}' has tried to add a new user without the"
@@ -283,15 +288,16 @@ def addUser():
         )
         return "You need to be an admin to create new users"
 
-    newUsername = request.form["username"]
-    newPassword = request.form["passhash"].encode("UTF-8")
+    newUsername = request.json["username"]
+    newPassword = request.json["passhash"].encode("UTF-8")
     newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
-    newPrivilege = request.form["privilege"]
+    newPrivilege = request.json["privilege"]
 
     createUser(db_conn, newUsername, newPassHash, newPrivilege)
     app.logger.info(
         f"New user '{newUsername}' has been created by '{username}'."
     )
+
     return "The new user has been created"
 
 
@@ -309,7 +315,7 @@ def deleteUser():
         )
         return "You need to be admin to remove new users"
 
-    username = request.form["username"]
+    username = request.json["username"]
     removeUser(db_conn, username)
 
     app.logger.info(f"User '{username}' has been deleted by user '{usern}'.")
@@ -322,7 +328,7 @@ def getUser(username: str):
     if username == "all":
         username = ""
 
-    columns = request.args.to_dict(flat=False)['cols']
+    columns = request.args.to_dict(flat=False)["cols"]
 
     if columns == ["all"]:
         columns = ""
@@ -335,7 +341,7 @@ def getUser(username: str):
 def getPageStats():
     """ Retrieves page viewing history. """
 
-    pageName = request.form["pagename"]
+    pageName = request.json["pagename"]
     app.logger.info("")
     pageID = getPageData(db_conn, pageName, "ID")[0]["ID"]
 
