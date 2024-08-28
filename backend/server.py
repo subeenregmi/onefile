@@ -73,7 +73,7 @@ def home():
     addPageVisit(db_conn, "login", None, request.remote_addr)
 
     if config['loginRequired']:
-        return render_template("loginpage.html")
+        return render_template("loginpage.html", host=config["host"])
     else:
         app.logger.info("Anonymous user logged in.")
         session['username'] = "Anonymous"
@@ -86,8 +86,8 @@ def home():
 def login():
     """ The api correlating to the logging in to the user."""
 
-    username = request.form['username']
-    password = request.form['password'].encode("UTF-8")
+    username = request.json["username"]
+    password = request.json["password"].encode("UTF-8")
 
     user = getUserData(db_conn, username, "")
 
@@ -100,12 +100,12 @@ def login():
 
     user = user[0]
 
-    if not checkpw(password, user['PassHash'].encode("UTF-8")):
+    if not checkpw(password, user["PassHash"].encode("UTF-8")):
         app.logger.info(f"User '{username}' login failed.")
         return render_template("loginpage.html")
 
-    session["username"] = user['Username']
-    session["privilege"] = str(user['Privilege'])
+    session["username"] = user["Username"]
+    session["privilege"] = str(user["Privilege"])
     session["user_id"] = str(user["ID"])
 
     return redirect(url_for('dashboard'))
@@ -120,14 +120,14 @@ def dashboard():
 
     if username is None:
         app.logger.info("User tried to access dashboard before logging in.")
-        return redirect(url_for('home'))
+        return redirect(url_for("home"))
 
     # Cannot login with the anonymous account if login is needed
     if username == "Anonymous" and config["loginRequired"]:
         app.logger.warning(
             "Anonymous passed login but failed dashboard check."
         )
-        return redirect(url_for('home'))
+        return redirect(url_for("home"))
 
     incrementPageVisits(db_conn, "dashboard")
     addPageVisit(
@@ -154,7 +154,7 @@ def dashboard():
             app.logger.warning(
                 f"User '{username}' has tried to login with unknown privilege."
             )
-            return redirect(url_for('home'))
+            return redirect(url_for("home"))
 
 
 @app.route('/api/file/upload', methods=["POST"])

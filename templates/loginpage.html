@@ -4,7 +4,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{{url_for('static', filename='styles/login.css')}}">
         <script src="{{url_for('static', filename='scripts/login.js')}}"></script>
-
         <!-- Playright Norge -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,11 +11,14 @@
     </head>
     <body>
         <div>
-            <form method="POST" action="/login"> 
-                <input type="text" name="username" placeholder="Username"><br>
+            <form id="login-form" action=""> 
+                <input id="text-form" type="text" name="username" placeholder="Username"><br>
                 <input type="password" name="password" placeholder="Password"><br>
-                <input class="sumbitbutton" type="submit" value="Login">
+                <input type="submit" value="Login">
             </form>
+            <script> 
+                init("{{host}}");
+            </script>
         </div>
     </body>
 </html>
