@@ -87,8 +87,8 @@ def home():
 def login():
     """ The api correlating to the logging in to the user."""
 
-    username = request.json["username"]
-    password = request.json["password"].encode("UTF-8")
+    username = request.json.get("username")
+    password = request.json.get("password").encode("UTF-8")
 
     user = getUserData(db_conn, username, "")
 
@@ -176,11 +176,11 @@ def uploadFile():
             " permissions.")
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    filename = request.form["filename"]
-    file = request.files["file"]
+    filename = request.form.get("filename")
+    file = request.files.get("file")
 
     # Empty file name
-    if filename is None or filename == "":
+    if not filename:
         app.logger.info(
             f"User '{username}' is trying to upload a file with no name."
         )
@@ -219,7 +219,7 @@ def deleteFile():
             " permissions.")
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    filename = request.json["filename"]
+    filename = request.json.get("filename")
 
     removeFileHistory(db_conn, filename)
     removeFile(db_conn, filename)
@@ -250,7 +250,9 @@ def getFile(filename):
 def downloadFile(filename: str):
     """ Api route to download a file. """
 
-    # TODO: improve security of this
+    privilege = Privilege(session.get("privilege"))
+    if checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
 
     filename = request.json["filename"]
     response = make_response(send_from_directory("../shared_files", filename))
@@ -273,6 +275,10 @@ def downloadFile(filename: str):
 def getFileStats():
     """ Api route to retrieve file download history."""
 
+    privilege = Privilege(session.get("privilege"))
+    if checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
+
     app.logger.debug(
         f"File statistics for '{request.json["filename"]}' retrieved."
     )
@@ -283,7 +289,11 @@ def getFileStats():
 def getHash(filename: str):
     """ Retrieves the hash of a file in the shared_files directory. """
 
-    filename = request.json["filename"]
+    privilege = Privilege(session.get("privilege"))
+    if checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
+
+    filename = request.json.get("filename")
     app.logger.info(f"Retrieving hash for {filename}.")
 
     if cacheResult := fileHashes.get(filename):
@@ -332,10 +342,10 @@ def addUser():
         )
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    newUsername = request.json["username"]
-    newPassword = request.json["passhash"].encode("UTF-8")
+    newUsername = request.json.get("username")
+    newPassword = request.json.get("passhash").encode("UTF-8")
     newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
-    newPrivilege = request.json["privilege"]
+    newPrivilege = request.json.get("privilege")
 
     createUser(db_conn, newUsername, newPassHash, newPrivilege)
     app.logger.info(
@@ -359,7 +369,7 @@ def deleteUser():
         )
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    username = request.json["username"]
+    username = request.json.get("username")
     removeUser(db_conn, username)
 
     app.logger.info(f"User '{username}' has been deleted by user '{usern}'.")
@@ -369,6 +379,11 @@ def deleteUser():
 @app.route("/api/user/search/<username>")
 def getUser(username: str):
     """ Retrieves information about a user """
+
+    privilege = Privilege(session.get("privilege"))
+    if checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
+
     if username == "all":
         username = ""
 
@@ -385,7 +400,11 @@ def getUser(username: str):
 def getPageStats():
     """ Retrieves page viewing history. """
 
-    pageName = request.json["pagename"]
+    privilege = Privilege(session.get("privilege"))
+    if checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
+
+    pageName = request.json.get("pagename")
     app.logger.info("")
     pageID = getPageData(db_conn, pageName, "ID")[0]["ID"]
 
@@ -395,6 +414,10 @@ def getPageStats():
 @app.route("/api/pages/<pageName>")
 def retrievePageData(pageName: str):
     """ Retrieves information about a page """
+
+    privilege = Privilege(session.get("privilege"))
+    if checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
 
     if pageName == "all":
         pageName = ""
