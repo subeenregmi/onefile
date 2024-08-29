@@ -1,6 +1,12 @@
 from enum import Enum
 
 
+class Privilege(Enum):
+    ADMIN = 1
+    UPLOADER = 2
+    USER = 3
+
+
 class Responses(Enum):
     SUCCESS = 1
     EMPTY_NAME = 2

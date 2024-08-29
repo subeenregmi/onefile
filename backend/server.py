@@ -13,19 +13,12 @@ from database_queries import (
 from database_utils import (
     setupDatabase, createAnonUser
 )
-from server_utils import Responses, create_resp
+from server_utils import Responses, Privilege, create_resp
 from bcrypt import hashpw, checkpw, gensalt
 from config import getConfig
 from logging.config import dictConfig
-from enum import Enum
 import hashlib
 import os
-
-
-class Privilege(Enum):
-    ADMIN = 1
-    UPLOADER = 2
-    USER = 3
 
 
 dictConfig(
@@ -84,9 +77,9 @@ def home():
         return render_template("loginpage.html", host=config["host"])
     else:
         app.logger.info("Anonymous user logged in.")
-        session['username'] = "Anonymous"
-        session['privilege'] = "3"
-        session['user_id'] = "-1"
+        session["username"] = "Anonymous"
+        session["privilege"] = 3
+        session["user_id"] = -1
         return redirect(url_for('dashboard'))
 
 
@@ -113,8 +106,8 @@ def login():
         return redirect(url_for("home"), 403)
 
     session["username"] = user["Username"]
-    session["privilege"] = str(user["Privilege"])
-    session["user_id"] = str(user["ID"])
+    session["privilege"] = user["Privilege"]
+    session["user_id"] = user["ID"]
 
     return redirect(url_for('dashboard'))
 
@@ -124,7 +117,7 @@ def dashboard():
     """ This is the page for whom who successfully login. """
 
     username = session.get("username")
-    privilege = session.get("privilege")
+    privilege = Privilege(session.get("privilege"))
 
     if username is None:
         app.logger.info("User tried to access dashboard before logging in.")
@@ -146,18 +139,21 @@ def dashboard():
     )
 
     match privilege:
-        case "1":
+        case Privilege.ADMIN:
             app.logger.info(f"Admin '{username}' has successfully logged in.")
             return render_template("adminpage.html", host=config["host"])
-        case "2":
+
+        case Privilege.UPLOADER:
             app.logger.info(
                 f"Uploader '{username}' has successfully logged in."
             )
             return render_template("uploadpage.html")
-        case "3":
+
+        case Privilege.USER:
             app.logger.info(f"Viewer '{username}' has successfully logged in.")
             return render_template("userpage.html", username=username,
                                    host=config["host"])
+
         case _:
             app.logger.warning(
                 f"User '{username}' has tried to login with unknown privilege."
@@ -172,9 +168,9 @@ def uploadFile():
     """
 
     username = session.get("username")
-    privilege = session.get("privilege")
+    privilege = Privilege(session.get("privilege"))
 
-    if (privilege != "1" and privilege != "2"):
+    if (privilege is not Privilege.ADMIN and privilege is not Privilege.UPLOADER):
         app.logger.warning(
             f"User '{username}' has tried to upload a file without the correct"
             " permissions.")
@@ -215,9 +211,9 @@ def deleteFile():
     """
 
     username = session.get("username")
-    privilege = session.get("privilege")
+    privilege = Privilege(session.get("privilege"))
 
-    if (privilege != "1" and privilege != "2"):
+    if (privilege is not Privilege.ADMIN and privilege is not Privilege.UPLOADER):
         app.logger.warning(
             f"User '{username}' has tried to delete a file without the correct"
             " permissions.")
@@ -326,11 +322,10 @@ def getHash(filename: str):
 @app.route("/api/user/create", methods=["POST"])
 def addUser():
     """ Api route to create a new user, admins can only create new users """
-    privilege = session.get("privilege")
     username = session.get("username")
+    privilege = Privilege(session.get("privilege"))
 
-
-    if (privilege != "1"):
+    if (privilege is not Privilege.ADMIN):
         app.logger.warning(
             f"User '{username}' has tried to add a new user without the"
             " correct permissions."
@@ -354,10 +349,10 @@ def addUser():
 def deleteUser():
     """ Api route to delete a user from the database """
 
-    privilege = session.get("privilege")
     usern = session.get("username")
+    privilege = Privilege(session.get("privilege"))
 
-    if (privilege != "1"):
+    if (privilege is not Privilege.ADMIN):
         app.logger.warning(
             f"User '{usern}' has tried to delete a user without the"
             " correct permissions."
