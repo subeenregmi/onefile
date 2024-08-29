@@ -15,8 +15,22 @@ class Responses(Enum):
     FILE_NOT_EXISTS = 5
 
 
-def create_resp(resp_c: Responses) -> dict[str, str]:
+def createResp(resp_c: Responses) -> dict[str, str]:
     """
     Creates a dictionary representing the stringified response code.
     """
     return {"RESP_CODE": resp_c.name}
+
+
+def checkPrivilege(priv: Privilege, needed_priv: Privilege) -> bool:
+    """
+    Checks the privilege against the needed privilege.
+    """
+
+    if not priv or not needed_priv:
+        return False
+
+    if priv.value > needed_priv.value:
+        return False
+
+    return True

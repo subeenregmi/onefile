@@ -13,7 +13,7 @@ from database_queries import (
 from database_utils import (
     setupDatabase, createAnonUser
 )
-from server_utils import Responses, Privilege, create_resp
+from server_utils import Responses, Privilege, createResp, checkPrivilege
 from bcrypt import hashpw, checkpw, gensalt
 from config import getConfig
 from logging.config import dictConfig
@@ -78,7 +78,7 @@ def home():
     else:
         app.logger.info("Anonymous user logged in.")
         session["username"] = "Anonymous"
-        session["privilege"] = 3
+        session["privilege"] = Privilege.USER.value
         session["user_id"] = -1
         return redirect(url_for('dashboard'))
 
@@ -170,11 +170,11 @@ def uploadFile():
     username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if (privilege is not Privilege.ADMIN and privilege is not Privilege.UPLOADER):
+    if checkPrivilege(privilege, Privilege.UPLOADER):
         app.logger.warning(
             f"User '{username}' has tried to upload a file without the correct"
             " permissions.")
-        return create_resp(Responses.PRIVILEGE_ERROR)
+        return createResp(Responses.PRIVILEGE_ERROR)
 
     filename = request.form["filename"]
     file = request.files["file"]
@@ -184,7 +184,7 @@ def uploadFile():
         app.logger.info(
             f"User '{username}' is trying to upload a file with no name."
         )
-        return create_resp(Responses.EMPTY_NAME)
+        return createResp(Responses.EMPTY_NAME)
 
     filename = secure_filename(filename)
 
@@ -194,14 +194,14 @@ def uploadFile():
             f"User '{username}' is trying to upload '{filename}', "
             "this name has been taken."
         )
-        return create_resp(Responses.TAKEN_FILE_NAME)
+        return createResp(Responses.TAKEN_FILE_NAME)
 
     file.save(f"shared_files/{filename}")
     addFile(db_conn, filename)
 
     app.logger.info(f"User {username} has added a new file: '{filename}'.")
 
-    return create_resp(Responses.SUCCESS)
+    return createResp(Responses.SUCCESS)
 
 
 @app.route('/api/file/delete', methods=["POST"])
@@ -213,11 +213,11 @@ def deleteFile():
     username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if (privilege is not Privilege.ADMIN and privilege is not Privilege.UPLOADER):
+    if checkPrivilege(privilege, Privilege.UPLOADER):
         app.logger.warning(
             f"User '{username}' has tried to delete a file without the correct"
             " permissions.")
-        return create_resp(Responses.PRIVILEGE_ERROR)
+        return createResp(Responses.PRIVILEGE_ERROR)
 
     filename = request.json["filename"]
 
@@ -225,7 +225,7 @@ def deleteFile():
     removeFile(db_conn, filename)
 
     app.logger.info(f"User {username} has delete a new file: '{filename}'.")
-    return create_resp(Responses.SUCCESS)
+    return createResp(Responses.SUCCESS)
 
 
 @app.route("/api/file", methods=["POST"])
@@ -300,7 +300,7 @@ def getHash(filename: str):
     )
 
     if not os.path.isfile(pathToFile):
-        return create_resp(Responses.FILE_NOT_EXISTS)
+        return createResp(Responses.FILE_NOT_EXISTS)
 
     sha_hash = hashlib.sha256()
     bufferSize = 65536  # 64KB
@@ -325,12 +325,12 @@ def addUser():
     username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if (privilege is not Privilege.ADMIN):
+    if checkPrivilege(privilege, Privilege.ADMIN):
         app.logger.warning(
             f"User '{username}' has tried to add a new user without the"
             " correct permissions."
         )
-        return create_resp(Responses.PRIVILEGE_ERROR)
+        return createResp(Responses.PRIVILEGE_ERROR)
 
     newUsername = request.json["username"]
     newPassword = request.json["passhash"].encode("UTF-8")
@@ -342,7 +342,7 @@ def addUser():
         f"New user '{newUsername}' has been created by '{username}'."
     )
 
-    return create_resp(Responses.SUCCESS)
+    return createResp(Responses.SUCCESS)
 
 
 @app.route("/api/user/delete", methods=["POST"])
@@ -352,18 +352,18 @@ def deleteUser():
     usern = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if (privilege is not Privilege.ADMIN):
+    if checkPrivilege(privilege, Privilege.ADMIN):
         app.logger.warning(
             f"User '{usern}' has tried to delete a user without the"
             " correct permissions."
         )
-        return create_resp(Responses.PRIVILEGE_ERROR)
+        return createResp(Responses.PRIVILEGE_ERROR)
 
     username = request.json["username"]
     removeUser(db_conn, username)
 
     app.logger.info(f"User '{username}' has been deleted by user '{usern}'.")
-    return create_resp(Responses.SUCCESS)
+    return createResp(Responses.SUCCESS)
 
 
 @app.route("/api/user/search/<username>")
