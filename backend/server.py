@@ -13,11 +13,19 @@ from database_queries import (
 from database_utils import (
     setupDatabase, createAnonUser
 )
+from server_utils import Responses, create_resp
 from bcrypt import hashpw, checkpw, gensalt
 from config import getConfig
 from logging.config import dictConfig
+from enum import Enum
 import hashlib
 import os
+
+
+class Privilege(Enum):
+    ADMIN = 1
+    UPLOADER = 2
+    USER = 3
 
 
 dictConfig(
@@ -127,7 +135,7 @@ def dashboard():
         app.logger.warning(
             "Anonymous passed login but failed dashboard check."
         )
-        return redirect(url_for("home"))
+        return redirect(url_for("home"), 403)
 
     incrementPageVisits(db_conn, "dashboard")
     addPageVisit(
@@ -154,7 +162,7 @@ def dashboard():
             app.logger.warning(
                 f"User '{username}' has tried to login with unknown privilege."
             )
-            return redirect(url_for("home"))
+            return redirect(url_for("home"), 403)
 
 
 @app.route('/api/file/upload', methods=["POST"])
@@ -162,7 +170,6 @@ def uploadFile():
     """ Api route to upload a file, needs to be sent through post
     form data.
     """
-    # TODO: make more appropriate response
 
     username = session.get("username")
     privilege = session.get("privilege")
@@ -171,7 +178,7 @@ def uploadFile():
         app.logger.warning(
             f"User '{username}' has tried to upload a file without the correct"
             " permissions.")
-        return "You need to be an admin or an uploader to upload files"
+        return create_resp(Responses.PRIVILEGE_ERROR)
 
     filename = request.form["filename"]
     file = request.files["file"]
@@ -181,7 +188,7 @@ def uploadFile():
         app.logger.info(
             f"User '{username}' is trying to upload a file with no name."
         )
-        return "You need to specify a name for the file"
+        return create_resp(Responses.EMPTY_NAME)
 
     filename = secure_filename(filename)
 
@@ -191,14 +198,14 @@ def uploadFile():
             f"User '{username}' is trying to upload '{filename}', "
             "this name has been taken."
         )
-        return "The file name you have specified has already been chosen"
+        return create_resp(Responses.TAKEN_FILE_NAME)
 
     file.save(f"shared_files/{filename}")
     addFile(db_conn, filename)
 
     app.logger.info(f"User {username} has added a new file: '{filename}'.")
 
-    return "The file has been successfully added"
+    return create_resp(Responses.SUCCESS)
 
 
 @app.route('/api/file/delete', methods=["POST"])
@@ -214,7 +221,7 @@ def deleteFile():
         app.logger.warning(
             f"User '{username}' has tried to delete a file without the correct"
             " permissions.")
-        return "You need to be an admin or an uploader to upload files"
+        return create_resp(Responses.PRIVILEGE_ERROR)
 
     filename = request.json["filename"]
 
@@ -222,10 +229,10 @@ def deleteFile():
     removeFile(db_conn, filename)
 
     app.logger.info(f"User {username} has delete a new file: '{filename}'.")
-    return "The file has been successfully deleted"
+    return create_resp(Responses.SUCCESS)
 
 
-@app.route("/api/file/<filename>", methods=["GET"])
+@app.route("/api/file", methods=["POST"])
 def getFile(filename):
     """ Api route to get file data. """
 
@@ -243,10 +250,13 @@ def getFile(filename):
     return getFileData(db_conn, filename, *columns)
 
 
-@app.route("/api/download/<filename>", methods=["GET"])
+@app.route("/api/file/download", methods=["GET"])
 def downloadFile(filename: str):
     """ Api route to download a file. """
 
+    # TODO: improve security of this
+
+    filename = request.json["filename"]
     response = make_response(send_from_directory("../shared_files", filename))
 
     # Ensuring that files download automatically and not open in browser.
@@ -263,7 +273,7 @@ def downloadFile(filename: str):
     return response
 
 
-@app.route("/api/file/stats", methods=["POST"])
+@app.route("/api/file/downloadhistory ", methods=["POST"])
 def getFileStats():
     """ Api route to retrieve file download history."""
 
@@ -273,20 +283,59 @@ def getFileStats():
     return getFileStatistics(db_conn, request.json["filename"])
 
 
+@app.route("/api/file/hash")
+def getHash(filename: str):
+    """ Retrieves the hash of a file in the shared_files directory. """
+
+    filename = request.json["filename"]
+    app.logger.info(f"Retrieving hash for {filename}.")
+
+    if cacheResult := fileHashes.get(filename):
+        return {
+            "filename": filename,
+            "hash": cacheResult
+        }
+
+    pathToFile = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "shared_files/",
+        secure_filename(filename)
+    )
+
+    if not os.path.isfile(pathToFile):
+        return create_resp(Responses.FILE_NOT_EXISTS)
+
+    sha_hash = hashlib.sha256()
+    bufferSize = 65536  # 64KB
+
+    with open(pathToFile, "rb") as f:
+        while True:
+            data = f.read(bufferSize)
+            if not data:
+                break
+            sha_hash.update(data)
+
+    fileHashes[filename] = sha_hash.hexdigest()
+    return {
+        "filename": filename,
+        "hash": fileHashes[filename]
+    }
+
+
 @app.route("/api/user/create", methods=["POST"])
 def addUser():
     """ Api route to create a new user, admins can only create new users """
     privilege = session.get("privilege")
     username = session.get("username")
 
-    # TODO: more appropriate responses
 
     if (privilege != "1"):
         app.logger.warning(
             f"User '{username}' has tried to add a new user without the"
             " correct permissions."
         )
-        return "You need to be an admin to create new users"
+        return create_resp(Responses.PRIVILEGE_ERROR)
 
     newUsername = request.json["username"]
     newPassword = request.json["passhash"].encode("UTF-8")
@@ -298,7 +347,7 @@ def addUser():
         f"New user '{newUsername}' has been created by '{username}'."
     )
 
-    return "The new user has been created"
+    return create_resp(Responses.SUCCESS)
 
 
 @app.route("/api/user/delete", methods=["POST"])
@@ -313,13 +362,13 @@ def deleteUser():
             f"User '{usern}' has tried to delete a user without the"
             " correct permissions."
         )
-        return "You need to be admin to remove new users"
+        return create_resp(Responses.PRIVILEGE_ERROR)
 
     username = request.json["username"]
     removeUser(db_conn, username)
 
     app.logger.info(f"User '{username}' has been deleted by user '{usern}'.")
-    return "The user has been deleted"
+    return create_resp(Responses.SUCCESS)
 
 
 @app.route("/api/user/search/<username>")
@@ -360,40 +409,6 @@ def retrievePageData(pageName: str):
         columns = ""
 
     return getPageData(db_conn, pageName, *columns)
-
-
-@app.route("/api/file/hash/<filename>")
-def getHash(filename: str):
-    """ Retrieves the hash of a file in the shared_files directory. """
-
-    app.logger.info(f"Retrieving hash for {filename}.")
-
-    if cacheResult := fileHashes.get(filename):
-        return cacheResult
-
-    pathToFile = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "shared_files/",
-        secure_filename(filename)
-    )
-
-    if not os.path.isfile(pathToFile):
-        return "Not a file"
-
-    sha_hash = hashlib.sha256()
-
-    bufferSize = 65536  # 64KB
-
-    with open(pathToFile, "rb") as f:
-        while True:
-            data = f.read(bufferSize)
-            if not data:
-                break
-            sha_hash.update(data)
-
-    fileHashes[filename] = sha_hash.hexdigest()
-    return fileHashes[filename]
 
 
 def main():
