@@ -73,7 +73,7 @@ def home():
     incrementPageVisits(db_conn, "login")
     addPageVisit(db_conn, "login", None, request.remote_addr)
 
-    if config['loginRequired']:
+    if config["loginRequired"]:
         return render_template("loginpage.html", host=config["host"])
     else:
         app.logger.info("Anonymous user logged in.")
@@ -121,7 +121,7 @@ def dashboard():
 
     if username is None:
         app.logger.info("User tried to access dashboard before logging in.")
-        return redirect(url_for("home"))
+        return redirect(url_for("home"), 403)
 
     # Cannot login with the anonymous account if login is needed
     if username == "Anonymous" and config["loginRequired"]:
@@ -170,7 +170,7 @@ def uploadFile():
     username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if checkPrivilege(privilege, Privilege.UPLOADER):
+    if not checkPrivilege(privilege, Privilege.UPLOADER):
         app.logger.warning(
             f"User '{username}' has tried to upload a file without the correct"
             " permissions.")
@@ -213,13 +213,19 @@ def deleteFile():
     username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if checkPrivilege(privilege, Privilege.UPLOADER):
+    if not checkPrivilege(privilege, Privilege.UPLOADER):
         app.logger.warning(
             f"User '{username}' has tried to delete a file without the correct"
             " permissions.")
         return createResp(Responses.PRIVILEGE_ERROR)
 
     filename = request.json.get("filename")
+
+    if not filename:
+        return createResp(Responses.EMPTY_NAME)
+
+    if not getFileData(db_conn, filename):
+        return createResp(Responses.FILE_NOT_EXISTS)
 
     removeFileHistory(db_conn, filename)
     removeFile(db_conn, filename)
@@ -228,11 +234,23 @@ def deleteFile():
     return createResp(Responses.SUCCESS)
 
 
-@app.route("/api/file", methods=["POST"])
-def getFile(filename):
+@app.route("/api/file/data", methods=["POST"])
+def getFile():
     """ Api route to get file data. """
 
-    columns = request.args.to_dict(flat=False)["cols"]
+    privilege = Privilege(session.get("privilege"))
+    if not checkPrivilege(privilege, Privilege.USER):
+        return createResp(Responses.PRIVILEGE_ERROR)
+
+    filename = request.json.get("filename")
+
+    if not filename:
+        return createResp(Responses.EMPTY_NAME)
+
+    if not getFileData(db_conn, filename):
+        return createResp(Responses.FILE_NOT_EXISTS)
+
+    columns = request.args.to_dict(flat=False).get("cols")
     if filename == "all":
         filename = ""
 
@@ -240,27 +258,33 @@ def getFile(filename):
         f"File information for '{filename or "*"}' is being retrieved."
     )
 
-    if columns == ["all"]:
+    if columns == ["all"] or not columns:
         columns = []
 
-    return getFileData(db_conn, filename, *columns)
+    return getFileData(db_conn, filename, *columns)[0]
 
 
-@app.route("/api/file/download", methods=["GET"])
-def downloadFile(filename: str):
+@app.route("/api/file/download", methods=["POST"])
+def downloadFile():
     """ Api route to download a file. """
 
     privilege = Privilege(session.get("privilege"))
-    if checkPrivilege(privilege, Privilege.USER):
+    if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    filename = request.json["filename"]
+    filename = request.json.get("filename")
+
+    if not filename:
+        return createResp(Responses.EMPTY_NAME)
+
+    if not (file := getFileData(db_conn, filename)):
+        return createResp(Responses.FILE_NOT_EXISTS)
+
     response = make_response(send_from_directory("../shared_files", filename))
 
     # Ensuring that files download automatically and not open in browser.
     response.headers["Content-Disposition"] = "attachment"
 
-    file = getFileData(db_conn, filename)
     username = session.get("username")
     userID = session.get("user_id")
 
@@ -271,26 +295,34 @@ def downloadFile(filename: str):
     return response
 
 
-@app.route("/api/file/downloadhistory ", methods=["POST"])
+@app.route("/api/file/downloadhistory", methods=["POST"])
 def getFileStats():
     """ Api route to retrieve file download history."""
 
     privilege = Privilege(session.get("privilege"))
-    if checkPrivilege(privilege, Privilege.USER):
+    if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
 
     app.logger.debug(
         f"File statistics for '{request.json["filename"]}' retrieved."
     )
-    return getFileStatistics(db_conn, request.json["filename"])
+    filename = request.json.get("filename")
+
+    if not filename:
+        return createResp(Responses.EMPTY_NAME)
+
+    if not getFileData(db_conn, filename):
+        return createResp(Responses.FILE_NOT_EXISTS)
+
+    return getFileStatistics(db_conn, filename)
 
 
-@app.route("/api/file/hash")
-def getHash(filename: str):
+@app.route("/api/file/hash", methods=["POST"])
+def getHash():
     """ Retrieves the hash of a file in the shared_files directory. """
 
     privilege = Privilege(session.get("privilege"))
-    if checkPrivilege(privilege, Privilege.USER):
+    if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
 
     filename = request.json.get("filename")
@@ -301,6 +333,12 @@ def getHash(filename: str):
             "filename": filename,
             "hash": cacheResult
         }
+
+    if not filename:
+        return createResp(Responses.EMPTY_NAME)
+
+    if not getFileData(db_conn, filename):
+        return createResp(Responses.FILE_NOT_EXISTS)
 
     pathToFile = os.path.join(
         os.path.dirname(__file__),
@@ -335,7 +373,7 @@ def addUser():
     username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if checkPrivilege(privilege, Privilege.ADMIN):
+    if not checkPrivilege(privilege, Privilege.ADMIN):
         app.logger.warning(
             f"User '{username}' has tried to add a new user without the"
             " correct permissions."
@@ -343,11 +381,27 @@ def addUser():
         return createResp(Responses.PRIVILEGE_ERROR)
 
     newUsername = request.json.get("username")
-    newPassword = request.json.get("passhash").encode("UTF-8")
-    newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
-    newPrivilege = request.json.get("privilege")
 
-    createUser(db_conn, newUsername, newPassHash, newPrivilege)
+    if not newUsername:
+        return createResp(Responses.EMPTY_USERNAME)
+
+    if getUserData(db_conn, newUsername):
+        return createResp(Responses.TAKEN_USERNAME)
+
+    newPassword = request.json.get("password")
+
+    if not newPassword:
+        return createResp(Responses.EMPTY_PASSWORD)
+
+    newPassword = newPassword.encode("UTF-8")
+
+    newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
+    newPrivilege = Privilege(request.json.get("privilege"))
+
+    if newPrivilege is Privilege.UNKNOWN:
+        return createResp(Responses.UNSPECIFIED_PRIVILEGE)
+
+    createUser(db_conn, newUsername, newPassHash, newPrivilege.value)
     app.logger.info(
         f"New user '{newUsername}' has been created by '{username}'."
     )
@@ -362,7 +416,7 @@ def deleteUser():
     usern = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
-    if checkPrivilege(privilege, Privilege.ADMIN):
+    if not checkPrivilege(privilege, Privilege.ADMIN):
         app.logger.warning(
             f"User '{usern}' has tried to delete a user without the"
             " correct permissions."
@@ -370,26 +424,43 @@ def deleteUser():
         return createResp(Responses.PRIVILEGE_ERROR)
 
     username = request.json.get("username")
+
+    if not username:
+        return createResp(Responses.EMPTY_USERNAME)
+
+    if not getUserData(db_conn, username):
+        return createResp(Responses.USER_NOT_FOUND)
+
+    # TODO: Fix? Foreign key constraint
+    # Add a deleted user
     removeUser(db_conn, username)
 
     app.logger.info(f"User '{username}' has been deleted by user '{usern}'.")
     return createResp(Responses.SUCCESS)
 
 
-@app.route("/api/user/search/<username>")
-def getUser(username: str):
+@app.route("/api/user/search", methods=["POST"])
+def getUser():
     """ Retrieves information about a user """
 
     privilege = Privilege(session.get("privilege"))
-    if checkPrivilege(privilege, Privilege.USER):
+    if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
+
+    username = request.json.get("username")
+
+    if not username:
+        return createResp(Responses.EMPTY_USERNAME)
+
+    if not getUserData(db_conn, username) and username != "all":
+        return createResp(Responses.USER_NOT_FOUND)
 
     if username == "all":
         username = ""
 
-    columns = request.args.to_dict(flat=False)["cols"]
+    columns = request.args.to_dict(flat=False).get("cols")
 
-    if columns == ["all"]:
+    if columns == ["all"] or not columns:
         columns = ""
 
     app.logger.debug(f"User data for '{username or "*"}' has been retrieved.")
@@ -401,29 +472,46 @@ def getPageStats():
     """ Retrieves page viewing history. """
 
     privilege = Privilege(session.get("privilege"))
-    if checkPrivilege(privilege, Privilege.USER):
+    if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
 
     pageName = request.json.get("pagename")
+
+    if not pageName:
+        return createResp(Responses.EMPTY_PAGE_NAME)
+
+    if not (pageID := getPageData(db_conn, pageName, "ID")):
+        return createResp(Responses.PAGE_NOT_FOUND)
+
+    # TODO: Fix this?
     app.logger.info("")
-    pageID = getPageData(db_conn, pageName, "ID")[0]["ID"]
+
+    pageID = pageID[0]["ID"]
 
     return getPageVisitsData(db_conn, pageID)
 
 
-@app.route("/api/pages/<pageName>")
-def retrievePageData(pageName: str):
+@app.route("/api/pages", methods=["POST"])
+def retrievePageData():
     """ Retrieves information about a page """
 
     privilege = Privilege(session.get("privilege"))
-    if checkPrivilege(privilege, Privilege.USER):
+    if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
+
+    pageName = request.json.get("pagename")
+
+    if not pageName:
+        return createResp(Responses.EMPTY_PAGE_NAME)
+
+    if not getPageData(db_conn, pageName, "ID") and pageName != "all":
+        return createResp(Responses.PAGE_NOT_FOUND)
 
     if pageName == "all":
         pageName = ""
 
-    columns = request.args.to_dict(flat=False)['cols']
-    if columns == ["all"]:
+    columns = request.args.to_dict(flat=False).get('cols')
+    if columns == ["all"] or not columns:
         columns = ""
 
     return getPageData(db_conn, pageName, *columns)

@@ -5,6 +5,11 @@ class Privilege(Enum):
     ADMIN = 1
     UPLOADER = 2
     USER = 3
+    UNKNOWN = 99
+
+    @classmethod
+    def _missing_(cls, value):
+        return cls.UNKNOWN
 
 
 class Responses(Enum):
@@ -13,13 +18,26 @@ class Responses(Enum):
     PRIVILEGE_ERROR = 3
     TAKEN_FILE_NAME = 4
     FILE_NOT_EXISTS = 5
+    EMPTY_USERNAME = 6
+    TAKEN_USERNAME = 7
+    EMPTY_PASSWORD = 8
+    UNSPECIFIED_PRIVILEGE = 9
+    USER_NOT_FOUND = 10
+    EMPTY_PAGE_NAME = 11
+    PAGE_NOT_FOUND = 12
 
 
 def createResp(resp_c: Responses) -> dict[str, str]:
     """
     Creates a dictionary representing the stringified response code.
     """
-    return {"RESP_CODE": resp_c.name}
+
+    resp = {"RESP_CODE": resp_c.name}
+
+    if resp_c is Responses.SUCCESS:
+        return resp, 200
+
+    return resp, 403
 
 
 def checkPrivilege(priv: Privilege, needed_priv: Privilege) -> bool:
