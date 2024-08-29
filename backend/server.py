@@ -8,7 +8,7 @@ from database_queries import (
     getUserData, addFile, removeFile, getFileData, addDownloadTransaction,
     incrementDownloadCount, getFileStatistics, createUser, removeUser,
     removeFileHistory, addPageVisit, incrementPageVisits, getPageData,
-    getPageVisitsData, refreshFiles
+    getPageVisitsData, refreshFiles, removeUserData
 )
 from database_utils import (
     setupDatabase, createAnonUser
@@ -247,7 +247,7 @@ def getFile():
     if not filename:
         return createResp(Responses.EMPTY_NAME)
 
-    if not getFileData(db_conn, filename):
+    if not getFileData(db_conn, filename) and filename != "all":
         return createResp(Responses.FILE_NOT_EXISTS)
 
     columns = request.args.to_dict(flat=False).get("cols")
@@ -261,7 +261,7 @@ def getFile():
     if columns == ["all"] or not columns:
         columns = []
 
-    return getFileData(db_conn, filename, *columns)[0]
+    return getFileData(db_conn, filename, *columns)
 
 
 @app.route("/api/file/download", methods=["POST"])
@@ -413,29 +413,30 @@ def addUser():
 def deleteUser():
     """ Api route to delete a user from the database """
 
-    usern = session.get("username")
+    username = session.get("username")
     privilege = Privilege(session.get("privilege"))
 
     if not checkPrivilege(privilege, Privilege.ADMIN):
         app.logger.warning(
-            f"User '{usern}' has tried to delete a user without the"
+            f"User '{username}' has tried to delete a user without the"
             " correct permissions."
         )
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    username = request.json.get("username")
+    usernameToDelete = request.json.get("username")
 
-    if not username:
+    if not usernameToDelete:
         return createResp(Responses.EMPTY_USERNAME)
 
-    if not getUserData(db_conn, username):
+    if not (userToDeleteData := getUserData(db_conn, usernameToDelete)):
         return createResp(Responses.USER_NOT_FOUND)
 
-    # TODO: Fix? Foreign key constraint
-    # Add a deleted user
-    removeUser(db_conn, username)
+    removeUserData(db_conn, userToDeleteData[0]["ID"])
+    removeUser(db_conn, usernameToDelete)
 
-    app.logger.info(f"User '{username}' has been deleted by user '{usern}'.")
+    app.logger.info(
+        f"User '{usernameToDelete}' has been deleted by user '{username}'."
+    )
     return createResp(Responses.SUCCESS)
 
 
@@ -471,6 +472,7 @@ def getUser():
 def getPageStats():
     """ Retrieves page viewing history. """
 
+    username = session.get("username")
     privilege = Privilege(session.get("privilege"))
     if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
@@ -483,15 +485,14 @@ def getPageStats():
     if not (pageID := getPageData(db_conn, pageName, "ID")):
         return createResp(Responses.PAGE_NOT_FOUND)
 
-    # TODO: Fix this?
-    app.logger.info("")
-
+    app.logger.info(f"User '{username}' has retrieved stats for the "
+                    "'{pageName}' page.")
     pageID = pageID[0]["ID"]
 
     return getPageVisitsData(db_conn, pageID)
 
 
-@app.route("/api/pages", methods=["POST"])
+@app.route("/api/pages/search", methods=["POST"])
 def retrievePageData():
     """ Retrieves information about a page """
 

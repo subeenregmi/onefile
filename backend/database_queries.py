@@ -380,3 +380,23 @@ def getPageVisitsData(
 
     columns = [*args] or getTableColumns("PageVisits")
     return [dict(zip(columns, page)) for page in pages]
+
+
+def removeUserData(
+    conn: sqlite3.Connection,
+    userID: int
+):
+    cur = conn.cursor()
+
+    cur.execute(f"""
+        DELETE FROM PageVisits
+        WHERE UserID = {userID}
+    """)
+    conn.commit()
+
+    cur.execute(f"""
+        DELETE FROM DownloadHistory
+        WHERE UserID = {userID}
+    """)
+
+    conn.commit()
