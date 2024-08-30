@@ -1,13 +1,12 @@
 import Chart from "chart.js/auto";
-import { Colors } from "chart.js";
 
-const fileAPI           = "api/file";
-const fileStatsAPI      = "api/file/stats";
+const fileAPI           = "api/file/data";
+const fileStatsAPI      = "api/file/downloadhistory";
 const addUserAPI        = "api/user/create";
 const deleteUserAPI     = "api/user/delete";
 const userAPI           = "api/user/search";
 const pageViewTransAPI  = "api/pages/history";
-const pageViewsAPI      = "api/pages";
+const pageViewsAPI      = "api/pages/search";
 
 async function createDownloadSummary(files) {
     
@@ -106,22 +105,53 @@ function translatePrivilege(num){
 
 
 async function quickSummary(host) {
-    let files = await fetch(`http://${host}/${fileAPI}/all?cols=all`);
+    let files = await fetch(`http://${host}/${fileAPI}?cols=all`, {
+        method: "POST", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            filename: "all"
+        })
+    });
     files = await files.json();
+    console.log(files);
 
-    await createDownloadSummary(files)
+    await createDownloadSummary(files);
 
-    let pageViews = await fetch(`http://${host}/${pageViewsAPI}/all?cols=all`);
+    let pageViews = await fetch(`http://${host}/${pageViewsAPI}?cols=all`, {
+        method: "POST", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            pagename: "all"
+        })
+    });
     pageViews = await pageViews.json();
 
     await createPageViewStats(pageViews);
 
-    let users = await fetch(`http://${host}/${userAPI}/all?cols=all`)
-    users = await users.json()
+    let users = await fetch(`http://${host}/${userAPI}?cols=all`, {
+        method: "POST", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username: "all"
+        })
+    });
+    users = await users.json();
 
     console.log(users);
 
     await createUsersSummary(users);
+
+    let pageViewTransactions = await fetch(`http://${host}/${pageViewTransAPI}`)
 }
 
+
 quickSummary("192.168.0.200:5000");
+
+   
+

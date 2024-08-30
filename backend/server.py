@@ -480,14 +480,31 @@ def getPageStats():
     if not pageName:
         return createResp(Responses.EMPTY_PAGE_NAME)
 
-    if not (pageID := getPageData(db_conn, pageName, "ID")):
+    pageID = getPageData(db_conn, pageName, "ID")
+
+    if not pageID and pageName != "all":
         return createResp(Responses.PAGE_NOT_FOUND)
+
+    if pageName == "all":
+        pageName = ""
+
+    columns = request.args.to_dict(flat=False).get("cols")
+    if columns == ["all"] or not columns:
+        columns = ""
+
+    ordering = request.args.to_dict(flat=False).get("order")
+    if not ordering:
+        ordering = ["asc"]
+
+    if ordering[-1] != "asc" and ordering[-1] != "desc":
+        return createResp(Responses.PARAMETER_ERROR)
 
     app.logger.info(f"User '{username}' has retrieved stats for the "
                     "'{pageName}' page.")
-    pageID = pageID[0]["ID"]
+    if pageID:
+        pageID = pageID[0]["ID"]
 
-    return getPageVisitsData(db_conn, pageID)
+    return getPageVisitsData(db_conn, pageID, ordering[-1], *columns)
 
 
 @app.route("/api/pages/search", methods=["POST"])

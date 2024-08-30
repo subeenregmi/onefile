@@ -320,6 +320,7 @@ def getPageData(
      """).fetchall()
 
     columns = [*args] or getTableColumns("Pages")
+    print(columns, [*args], getTableColumns("Pages"))
     return [dict(zip(columns, page)) for page in pages]
 
 
@@ -356,6 +357,7 @@ def addPageVisit(
 def getPageVisitsData(
     conn: sqlite3.Connection,
     pageID: int,
+    ordering: str,
     *args: str
 ) -> list[dict[str, str | int | None]]:
     """
@@ -372,10 +374,14 @@ def getPageVisitsData(
 
     cur = conn.cursor()
 
+    if not pageID:
+        pageID = "PageID"
+
     pages = cur.execute(f"""
         SELECT {", ".join([*args]) or "*"}
         FROM PageVisits
         WHERE PageID = {pageID}
+        ORDER BY Timestamp {ordering.upper()}
      """).fetchall()
 
     columns = [*args] or getTableColumns("PageVisits")

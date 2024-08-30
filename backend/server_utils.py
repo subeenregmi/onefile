@@ -25,6 +25,7 @@ class Responses(Enum):
     USER_NOT_FOUND = 10
     EMPTY_PAGE_NAME = 11
     PAGE_NOT_FOUND = 12
+    PARAMETER_ERROR = 13
 
 
 def createResp(resp_c: Responses) -> dict[str, str]:
