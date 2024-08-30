@@ -1,6 +1,6 @@
 const hashAPI = "api/file/hash";
-const fileAPI = "api/file";
-const downloadFileAPI = "api/download"
+const fileAPI = "api/file/data";
+const downloadFileAPI = "api/file/download"
 
 class OneFile {
     constructor(name, hash, downloadLink, downloadCount, uploadDate) {
@@ -16,14 +16,31 @@ class OneFile {
 async function initialiseFiles(host) {
     let oneFilesList = [];
     try {
-        let files = await fetch(`http://${host}/${fileAPI}/all?cols=all`);
+        let files = await fetch(`http://${host}/${fileAPI}?cols=all`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    filename: "all"
+                }),
+            });
         files = await files.json();
 
         for (let i = 0; i < files.length; i++) {
             let file = files[i];
             let newFile = new OneFile(
                 file["FileName"],
-                await fetch(`http://${host}/${hashAPI}/${file["FileName"]}`),
+                await fetch(`http://${host}/${hashAPI}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        filename: file["FileName"] 
+                    }),
+                }),
                 `http://${host}/${downloadFileAPI}/${file["FileName"]}`,
                 file["DownloadCount"],
                 file["UploadDate"]

@@ -19,6 +19,11 @@ async function login(host, form) {
     if (req.status == 200) {
         window.location = `http://${host}:5000/dashboard`;
     }
+    else {
+        let popup = document.getElementById("popup");
+        popup.style.visibility = "visible";
+        popup.style.opacity = 1;
+    }
 }
 
 function init(host) {

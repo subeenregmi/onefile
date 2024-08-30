@@ -3,10 +3,8 @@
     src: url('fonts/SF-Pro-Display-Regular.otf')
 }
 
-
 * {
     font-family: 'SF-Pro';
-    font-size: 26px;
 }
 
 body {
@@ -20,15 +18,35 @@ body {
 }
 
 form {
+    font-size: 26px;
     display: flex;
     flex-direction: column;
     width: 300px;
 }
 
 input { 
+    font-size: 26px;
     padding: 5px;
     margin: 3px;
     border: 2px solid black;
     border-radius: 5px;
 }
+
+div.wrong-creds {
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    margin-top: 10px;
+    background-color: #EA526F;
+    color: white;
+    border-radius: 10px;
+    outline: 2px solid #912F40;
+    outline-offset: -5px;
+    font-size: 20px;
+    visibility: collapse;
+    opacity: 0;
+    
+    transition: opacity 0.2s linear;
+}
+
 

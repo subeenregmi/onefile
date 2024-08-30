@@ -264,15 +264,13 @@ def getFile():
     return getFileData(db_conn, filename, *columns)
 
 
-@app.route("/api/file/download", methods=["POST"])
-def downloadFile():
+@app.route("/api/file/download/<filename>", methods=["GET"])
+def downloadFile(filename: str):
     """ Api route to download a file. """
 
     privilege = Privilege(session.get("privilege"))
     if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
-
-    filename = request.json.get("filename")
 
     if not filename:
         return createResp(Responses.EMPTY_NAME)

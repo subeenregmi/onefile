@@ -15,6 +15,9 @@
                 <input id="text-form" type="text" name="username" placeholder="Username"><br>
                 <input type="password" name="password" placeholder="Password"><br>
                 <input type="submit" value="Login">
+                <div id="popup" class="wrong-creds">
+                    <p> Incorrect username or password, try again.</p>
+                </div>
             </form>
             <script> 
                 init("{{host}}");
