@@ -85,6 +85,6 @@ async function displayFiles(host) {
     }
 }
 
-displayFiles("192.168.0.200:5000");
+window.displayFiles = displayFiles;
 
 

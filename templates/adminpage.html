@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="{{url_for('static', filename='dist/admin.js')}}" type="module">
+        <script src="{{url_for('static', filename='dist/admin.js')}}">
+        </script>
+        <script>
+            quickSummary("{{host}}:5000");
         </script>
         <link rel="stylesheet" href="{{url_for('static', filename='styles/admin.css')}}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,9 +34,9 @@
                 <p>Users</p>
                 <table id="users-sum"></table>
             </div>
-            <div class="stat">
-                <p>Chart 4</p>
-                <canvas id=""></canvas>
+            <div class="stat" style="grid-area: 3 / 1 / 5 / 3">
+                <p>Most recent views</p>
+                <table id="views-sum"></table>
             </div>
             <div class="stat">
                 <p>Chart 5</p>
@@ -45,22 +48,6 @@
             </div>
             <div class="stat">
                 <p>Chart 6</p>
-                <canvas id=""></canvas>
-            </div>
-            <div class="stat">
-                <p>Chart 7</p>
-                <canvas id=""></canvas>
-            </div>
-            <div class="stat">
-                <p>Chart 8</p>
-                <canvas id=""></canvas>
-            </div>
-            <div class="stat">
-                <p>Chart 9</p>
-                <canvas id=""></canvas>
-            </div>
-            <div class="stat">
-                <p>Chart 10</p>
                 <canvas id=""></canvas>
             </div>
         </div>

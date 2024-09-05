@@ -88,7 +88,11 @@ def login():
     """ The api correlating to the logging in to the user."""
 
     username = request.json.get("username")
-    password = request.json.get("password").encode("UTF-8")
+    password = request.json.get("password")
+    if not password:
+        return redirect(url_for("home"), 403)
+
+    password = password.encode("UTF-8")
 
     user = getUserData(db_conn, username, "")
 

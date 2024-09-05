@@ -90,6 +90,47 @@ async function createUsersSummary(users) {
     }
 }
 
+async function createRecentViews(views) {
+    let table = document.getElementById("views-sum");
+    let tableRow = document.createElement("tr");
+    
+    let headings = ["ID", "IP", "Page", "Timestamp", "User"];
+    for (let i = 0; i < headings.length; i++) {
+        let tableHeading = document.createElement("th");
+        tableHeading.innerHTML = headings[i];
+        tableRow.appendChild(tableHeading);
+    }
+
+    table.appendChild(tableRow);
+
+    for (let i = 0; i < 50; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerHTML = views[i].ID;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = views[i].IpAddress;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = views[i].PageID;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = views[i].Timestamp;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = views[i].UserID;
+        tr.appendChild(td);
+
+        table.appendChild(tr);
+    }
+
+}
+
 function translatePrivilege(num){
     switch (num) {
         case 1:
@@ -105,6 +146,7 @@ function translatePrivilege(num){
 
 
 async function quickSummary(host) {
+
     let files = await fetch(`http://${host}/${fileAPI}?cols=all`, {
         method: "POST", 
         headers: {
@@ -147,11 +189,24 @@ async function quickSummary(host) {
 
     await createUsersSummary(users);
 
-    let pageViewTransactions = await fetch(`http://${host}/${pageViewTransAPI}`)
+    let pageViewTransactions = await fetch(
+        `http://${host}/${pageViewTransAPI}?order=desc`, 
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                pagename: "all"
+            })
+        }
+    );
+
+    pageViewTransactions = await pageViewTransactions.json();
+
+    console.log(pageViewTransactions);
+
+    await createRecentViews(pageViewTransactions);
 }
 
-
-quickSummary("192.168.0.200:5000");
-
-   
-
+window.quickSummary = quickSummary
