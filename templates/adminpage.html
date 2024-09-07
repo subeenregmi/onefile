@@ -8,15 +8,14 @@
         </script>
         <link rel="stylesheet" href="{{url_for('static', filename='styles/admin.css')}}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
-        <header>
-            <h1>Onefile</h1>
+    </head> <body> <header> <h1>Onefile</h1>
             <nav class="nav-container">
                 <button class="nav-button">Files</button>
                 <button class="nav-button">Users</button>
                 <button class="nav-button">Stats</button>
-                <button class="nav-button" style="float: right">Logout</button>
+                <a href="http://{{host}}:5000/">
+                    <button class="nav-button" style="float: right">Logout</button>
+                </a>
                 <button class="nav-button" style="float: right">Settings</button>
             </nav>
         </header>
@@ -38,9 +37,28 @@
                 <p>Most recent views</p>
                 <table id="views-sum"></table>
             </div>
-            <div class="stat">
-                <p>Chart 5</p>
-                <canvas id=""></canvas>
+            <div class="stat" style="grid-area: 3 / 3 / 5 / 4">
+                <p>Create user</p>
+                <form id="create-user-form" action="">
+                    <div>
+                        <input type="text" id="uname" name="new-username" 
+                        placeholder="Username" required>
+                    </div>
+                    <div>
+                        <input type="text" id="passwd" name="new-password" 
+                        placeholder="Password" required>
+                    </div>
+                    <div>
+                        <select name="new-privilege" required>
+                            <option value=1>Admin</option>
+                            <option value=2>Uploader</option>
+                            <option value=3>User</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="submit" value="Submit">
+                    </div>
+                </form>
             </div>
             <div class="stat">
                 <p>Chart 5</p>
@@ -51,5 +69,8 @@
                 <canvas id=""></canvas>
             </div>
         </div>
+        <script>
+            initform("{{host}}:5000");
+        </script>
     </body>
 </html>

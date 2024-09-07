@@ -209,4 +209,38 @@ async function quickSummary(host) {
     await createRecentViews(pageViewTransactions);
 }
 
-window.quickSummary = quickSummary
+async function createNewUser(host, form) {
+    let formData = new FormData(form);
+
+    let resp = await fetch (
+        `http://${host}/${addUserAPI}`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "username":`${formData.get("new-username")}`,
+                "password":`${formData.get("new-password")}`,
+                "privilege": Number(formData.get("new-privilege")),
+            })
+        }
+    );
+    if (resp.status == 200) {
+        window.alert("User created!");
+    }
+    else {
+        let respj = await resp.json();
+        console.log(respj);
+    }
+}
+
+function init(host) {
+    document.getElementById("create-user-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        createNewUser(host, e.target);
+    });
+}
+
+window.quickSummary = quickSummary;
+window.initform = init;
