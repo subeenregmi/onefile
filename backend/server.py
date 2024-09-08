@@ -399,7 +399,7 @@ def addUser():
 
     newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
     newPrivilege = Privilege(request.json.get("privilege"))
-    print(request.json.get("privilege"), newPrivilege)
+    print(request.json.get("privilege"))
 
     if newPrivilege is Privilege.UNKNOWN:
         return createResp(Responses.UNSPECIFIED_PRIVILEGE)

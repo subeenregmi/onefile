@@ -235,10 +235,39 @@ async function createNewUser(host, form) {
     }
 }
 
+async function deleteUser(host, form) {
+    let formData = new FormData(form);
+
+    let resp = await fetch(
+        `http://${host}/${deleteUserAPI}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "username": formData.get("username")
+            })
+        }
+    )
+    if (resp.status == 200) {
+        window.alert("User deleted");
+    }
+    else {
+        let respj = await resp.json();
+        console.log(respj);
+    }
+}
+
+
 function init(host) {
     document.getElementById("create-user-form").addEventListener("submit", function (e) {
         e.preventDefault();
         createNewUser(host, e.target);
+    });
+    document.getElementById("delete-user-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        deleteUser(host, e.target);
     });
 }
 
