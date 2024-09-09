@@ -157,7 +157,6 @@ async function quickSummary(host) {
         })
     });
     files = await files.json();
-    console.log(files);
 
     await createDownloadSummary(files);
 
@@ -185,7 +184,6 @@ async function quickSummary(host) {
     });
     users = await users.json();
 
-    console.log(users);
 
     await createUsersSummary(users);
 
@@ -203,8 +201,6 @@ async function quickSummary(host) {
     );
 
     pageViewTransactions = await pageViewTransactions.json();
-
-    console.log(pageViewTransactions);
 
     await createRecentViews(pageViewTransactions);
 }
@@ -226,13 +222,8 @@ async function createNewUser(host, form) {
             })
         }
     );
-    if (resp.status == 200) {
-        window.alert("User created!");
-    }
-    else {
-        let respj = await resp.json();
-        console.log(respj);
-    }
+    let respj = await resp.json();
+    await popup(respj);
 }
 
 async function deleteUser(host, form) {
@@ -250,14 +241,65 @@ async function deleteUser(host, form) {
             })
         }
     )
-    if (resp.status == 200) {
-        window.alert("User deleted");
-    }
-    else {
-        let respj = await resp.json();
-        console.log(respj);
-    }
+    let respj = await resp.json();
+    await popup(respj);
 }
+
+async function popup(response) {
+    let container = document.getElementById("response-bubble");
+    container.style.backgroundColor = "red";
+    switch (response.RESP_CODE){
+        case "SUCCESS":
+            container.style.backgroundColor = "green";
+            container.innerText = "Success!";
+            break;
+        case "USER_NOT_FOUND":
+            container.innerText = "The user you have entered does not exist.";
+            break;
+        case "EMPTY_NAME":
+            container.innerText = "The file name specified is not filled out."
+            break;
+        case "PRIVILEGE_ERROR":
+            container.innerText = "Your account does not hold the required privileges to send out this request.";
+            break;
+        case "TAKEN_FILE_NAME":
+            container.innerText = "The file name you specified has already been taken, try another name.";
+            break;
+        case "FILE_NOT_EXISTS":
+            container.innerText = "The file you specified does not exist, try again.";
+            break;
+        case "EMPTY_USERNAME":
+            container.innerText = "The username is not specified, enter a username.";
+            break;
+        case "TAKEN_USERNAME":
+            container.innerText = "The username specifed has already been taken, try again.";
+            break;
+        case "EMPTY_PASSWORD":
+            container.innerText = "The password field was left empty, try again.";
+            break;
+        case "UNSPECIFIED_PRIVILEGE":
+            container.innerText = "The privilege field was left empty, try again.";
+            break;
+        case "EMPTY_PAGE_NAME":
+            container.innerText = "The page field was left empty, try again.";
+            break;
+        case "PAGE_NOT_FOUND":
+            container.innerText = "The page specified does not exist.";
+            break;
+        case "PARAMETER_ERROR":
+            container.innerText = "The parameters specified is not valid, try again.";
+            break;
+        default:
+            container.innerText = response.RESP_CODE; 
+            break;
+    }
+    container.style.opacity = 1;
+    setTimeout(() => {
+        container.style.opacity = 0;
+    }, 2500)
+        
+   
+} 
 
 
 function init(host) {

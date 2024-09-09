@@ -104,3 +104,23 @@ h2 {
     padding: 5px;
     border-radius: 5px;
 }
+
+div.response-bubble {
+    position: fixed;
+    top: 10%;
+    left: calc(50% - 15%/2);
+    width: 15%;
+    background-color: red;
+    color: white;
+    text-align: center;
+    height: 150px;
+    padding: 10px;
+    box-sizing:  border-box;
+    border-radius: 10px;
+    outline: 2px solid black;
+    outline-offset: -5px;
+    font-size: 18px;
+    opacity: 0;
+ 
+    transition: opacity 0.5s ease-in-out;
+}
