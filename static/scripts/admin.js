@@ -307,36 +307,11 @@ function makeViewsHidden() {
     }
 }
 
-function homeView(host) {
+function viewPage(host, pagename) {
     makeViewsHidden();
-    let view = document.getElementById("home-page");
+    let view = document.getElementById(pagename);
     view.style.display = "block";
 }
-
-function filesView(host) {
-    makeViewsHidden();
-    let view = document.getElementById("file-page");
-    view.style.display = "block";
-}
-
-function usersView(host) {
-    makeViewsHidden();
-    let view = document.getElementById("users-page");
-    view.style.display = "block";
-}
-
-function statsView(host) {
-    makeViewsHidden();
-    let view = document.getElementById("stats-page");
-    view.style.display = "block";
-}
-
-function settingsView(host) {
-    makeViewsHidden();
-    let view = document.getElementById("settings-page");
-    view.style.display = "block";
-}
-
 
 function init(host) {
     document.getElementById("create-user-form").addEventListener("submit", function (e) {
@@ -348,13 +323,14 @@ function init(host) {
         deleteUser(host, e.target);
     });
     
-    let pageViews = [homeView, filesView, usersView, statsView, settingsView];
+    let pages = ["home-page", "file-page", "users-page", "stats-page", 
+        "settings-page"];
     let buttons = Array.from(document.getElementsByClassName("nav-button"));
     buttons = buttons.filter((button) => button.id != "logout-button");
     for (let i = 0; i<buttons.length; i++) {
         buttons[i].addEventListener("click", function (e) {
             e.preventDefault();
-            pageViews[i](host);
+            viewPage(host, pages[i]);
         })
     }
 }
