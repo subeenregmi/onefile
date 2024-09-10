@@ -298,8 +298,44 @@ async function popup(response) {
         container.style.opacity = 0;
     }, 2500)
         
-   
-} 
+}
+
+function makeViewsHidden() {
+    let divs = document.getElementsByClassName("page");
+    for (let i = 0; i<divs.length; i++) {
+        divs[i].style.display = "none";
+    }
+}
+
+function homeView(host) {
+    makeViewsHidden();
+    let view = document.getElementById("home-page");
+    view.style.display = "block";
+}
+
+function filesView(host) {
+    makeViewsHidden();
+    let view = document.getElementById("file-page");
+    view.style.display = "block";
+}
+
+function usersView(host) {
+    makeViewsHidden();
+    let view = document.getElementById("users-page");
+    view.style.display = "block";
+}
+
+function statsView(host) {
+    makeViewsHidden();
+    let view = document.getElementById("stats-page");
+    view.style.display = "block";
+}
+
+function settingsView(host) {
+    makeViewsHidden();
+    let view = document.getElementById("settings-page");
+    view.style.display = "block";
+}
 
 
 function init(host) {
@@ -311,6 +347,16 @@ function init(host) {
         e.preventDefault();
         deleteUser(host, e.target);
     });
+    
+    let pageViews = [homeView, filesView, usersView, statsView, settingsView];
+    let buttons = Array.from(document.getElementsByClassName("nav-button"));
+    buttons = buttons.filter((button) => button.id != "logout-button");
+    for (let i = 0; i<buttons.length; i++) {
+        buttons[i].addEventListener("click", function (e) {
+            e.preventDefault();
+            pageViews[i](host);
+        })
+    }
 }
 
 window.quickSummary = quickSummary;
