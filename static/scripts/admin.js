@@ -2,11 +2,14 @@ import Chart from "chart.js/auto";
 
 const fileAPI           = "api/file/data";
 const fileStatsAPI      = "api/file/downloadhistory";
+const uploadFileAPI     = "api/file/upload";
+const deleteFileAPI     = "api/file/delete";
 const addUserAPI        = "api/user/create";
 const deleteUserAPI     = "api/user/delete";
 const userAPI           = "api/user/search";
 const pageViewTransAPI  = "api/pages/history";
 const pageViewsAPI      = "api/pages/search";
+
 
 async function createDownloadSummary(files) {
     
@@ -44,7 +47,6 @@ async function createPageViewStats(pageViews) {
         tableHeading.innerHTML = headings[i];
         tableRow.appendChild(tableHeading);
     }
-
     table.appendChild(tableRow);
 
     for (let i = 0; i < pageViews.length; i++) {
@@ -144,6 +146,77 @@ function translatePrivilege(num){
     }
 }
 
+async function deleteFile(host, fname) {
+    let resp = await fetch(`http://${host}/${deleteFileAPI}`, {
+        method: "POST" ,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            filename: fname
+        })
+    });
+    let respj = await resp.json();
+    await popup(respj);
+}
+
+
+async function createFilesTable(host, files) {
+    let table = document.getElementById("file-table-id");
+
+    for (let i = 0; i < files.length; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerHTML = files[i].ID;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = files[i].FileName;
+        td.classList.add("delete-file");
+        td.onclick = (() => {
+            deleteFile(host, files[i].FileName);
+        })
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = files[i].DownloadCount;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = files[i].UploadDate;
+        tr.appendChild(td);
+
+        table.appendChild(tr);
+    }
+}
+
+async function createUsersTable(host, users) {
+    let table = document.getElementById("users-table-id");
+
+    for (let i = 0; i < users.length; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerHTML = users[i].ID;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = users[i].Username;
+        td.classList.add("delete-file");
+        td.onclick = (() => {
+            deleteUserFromName(host, users[i].Username);
+        })
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = translatePrivilege(users[i].Privilege);
+        tr.appendChild(td);
+
+        table.appendChild(tr);
+    }
+}
+
 
 async function quickSummary(host) {
 
@@ -159,6 +232,7 @@ async function quickSummary(host) {
     files = await files.json();
 
     await createDownloadSummary(files);
+    await createFilesTable(host, files);
 
     let pageViews = await fetch(`http://${host}/${pageViewsAPI}?cols=all`, {
         method: "POST", 
@@ -184,8 +258,8 @@ async function quickSummary(host) {
     });
     users = await users.json();
 
-
     await createUsersSummary(users);
+    await createUsersTable(host, users);
 
     let pageViewTransactions = await fetch(
         `http://${host}/${pageViewTransAPI}?order=desc`, 
@@ -202,8 +276,45 @@ async function quickSummary(host) {
 
     pageViewTransactions = await pageViewTransactions.json();
 
+    await createViewTransactionsTable(pageViewTransactions, pageViews, users);
     await createRecentViews(pageViewTransactions);
 }
+
+function createViewTransactionsTable(views, pages, users) {
+    let table = document.getElementById("view-table-id");
+
+    for (let i = 0; i < views.length; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerHTML = views[i].ID;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        if (views[i].UserID){
+            td.innerHTML = users[views[i].UserID - 1].Username
+        }
+        else{
+            td.innerHTML = views[i].UserID;
+        }
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = views[i].IpAddress;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = pages[views[i].PageID - 1].Name;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = views[i].Timestamp;
+        tr.appendChild(td);
+
+        table.appendChild(tr);
+    }
+}
+
 
 async function createNewUser(host, form) {
     let formData = new FormData(form);
@@ -245,6 +356,39 @@ async function deleteUser(host, form) {
     await popup(respj);
 }
 
+async function deleteUserFromName(host, username) {
+    let resp = await fetch(
+        `http://${host}/${deleteUserAPI}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "username": username
+            })
+        }
+    )
+    let respj = await resp.json();
+    await popup(respj);
+}
+
+async function uploadFile(host, form) {
+    let formData = new FormData(form);
+    let file = document.getElementById("file-upload-input").files[0];
+    formData.append("file", file);
+
+    let resp = await fetch(
+        `http://${host}/${uploadFileAPI}`,
+        {
+            method: "POST",
+            body: formData
+        }
+    )
+    let respj = await resp.json();
+    await popup(respj);
+}
+
 async function popup(response) {
     let container = document.getElementById("response-bubble");
     container.style.backgroundColor = "red";
@@ -272,7 +416,7 @@ async function popup(response) {
             container.innerText = "The username is not specified, enter a username.";
             break;
         case "TAKEN_USERNAME":
-            container.innerText = "The username specifed has already been taken, try again.";
+            container.innerText = "The username specified has already been taken, try again.";
             break;
         case "EMPTY_PASSWORD":
             container.innerText = "The password field was left empty, try again.";
@@ -288,6 +432,9 @@ async function popup(response) {
             break;
         case "PARAMETER_ERROR":
             container.innerText = "The parameters specified is not valid, try again.";
+            break;
+        case "FILE_NOT_UPLOADED":
+            container.innerText = "The file provided is not valid, try again.";
             break;
         default:
             container.innerText = response.RESP_CODE; 
@@ -321,6 +468,10 @@ function init(host) {
     document.getElementById("delete-user-form").addEventListener("submit", function (e) {
         e.preventDefault();
         deleteUser(host, e.target);
+    });
+    document.getElementById("upload-file-form-id").addEventListener("submit", function (e) {
+        e.preventDefault();
+        uploadFile(host, e.target);
     });
     
     let pages = ["home-page", "file-page", "users-page", "stats-page", 

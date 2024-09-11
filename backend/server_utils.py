@@ -26,6 +26,7 @@ class Responses(Enum):
     EMPTY_PAGE_NAME = 11
     PAGE_NOT_FOUND = 12
     PARAMETER_ERROR = 13
+    FILE_NOT_UPLOADED = 14
 
 
 def createResp(resp_c: Responses) -> dict[str, str]:

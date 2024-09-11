@@ -45,6 +45,10 @@ h2 {
     margin: 1% 1%;
 }
 
+h3 {
+    margin: 1% 1%;
+}
+
 .container {
     height: 90%;
     width: 95%;
@@ -140,4 +144,71 @@ div.response-bubble {
 .page {
     display: none;
     height: 80vh;
+}
+
+table.file-table {
+    width: 99%;
+    margin: auto;
+    text-align: center;
+    font-size: 20px;
+    border-collapse: collapse;
+}
+
+.file-table th:first-child {
+    width: 5%;
+}
+
+.file-table th {
+    width: 25%;
+    border-right: 2px solid black;
+}
+
+.file-table td {
+    border-right: 2px solid black;
+    padding: 2px;
+}
+
+.file-table td:last-child {
+    border-right: 0 ;
+}
+
+.file-table th:last-child {
+    border-right: 0;
+}
+
+.file-table tr:first-child {
+    border-bottom: 2px solid black;
+}
+
+.delete-file:hover {
+    cursor: pointer;
+    text-decoration: line-through;
+    text-decoration-thickness: 0.2rem;
+    text-decoration-color: red;
+}
+
+div.upload-file-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-file-form form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.upload-file-form input {
+    width: 100%;
+    font-size: 18px;
+    margin: 5px;
+}
+
+.table-container {
+    max-height: 50%;
+    overflow: auto;
+    border: 2px solid black;
 }

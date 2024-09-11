@@ -183,6 +183,12 @@ def uploadFile():
     filename = request.form.get("filename")
     file = request.files.get("file")
 
+    if not file:
+        app.logger.info(
+            f"User '{username}' is uploaded no files."
+        )
+        return createResp(Responses.FILE_NOT_UPLOADED)
+
     # Empty file name
     if not filename:
         app.logger.info(
