@@ -158,6 +158,15 @@ table.file-table {
     width: 5%;
 }
 
+.dlhistory th:first-child {
+    width: 33%;
+}
+
+.dlhistory th, .dlhistory td {
+    width: 33%;
+}
+
+
 .file-table th {
     width: 25%;
     border-right: 2px solid black;

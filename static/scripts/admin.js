@@ -278,6 +278,61 @@ async function quickSummary(host) {
 
     await createViewTransactionsTable(pageViewTransactions, pageViews, users);
     await createRecentViews(pageViewTransactions);
+
+    let fileDLHistory = await fetch(
+        `http://${host}/${fileStatsAPI}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filename: "all"
+            })
+        }
+    )
+    fileDLHistory = await fileDLHistory.json();
+    await createFileDownloadHistoryTable(fileDLHistory, files, users);
+}
+
+function createFileDownloadHistoryTable(fileDLHistory, files, users) { 
+    let table = document.getElementById("download-history-table-id");
+
+    for (let i = 0; i < fileDLHistory.length; i++) {
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        if (fileDLHistory[i].FileID) {
+            for (let j = 0; j < files.length; j++) {
+                if (files[j].ID == fileDLHistory[i].FileID) {
+                    td.innerHTML = files[j].FileName;
+                }
+            }
+        }
+        else {
+            td.innerHTML = "Unknown file";
+        }
+
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        if (fileDLHistory[i].UserID) {
+            td.innerHTML = users[fileDLHistory[i].UserID - 1].Username;
+        }
+        else {
+            td.innerHTML = "Unknown user"
+        }
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerHTML = fileDLHistory[i].Timestamp;
+        tr.appendChild(td);
+
+
+        table.appendChild(tr);
+    }
+    
+
 }
 
 function createViewTransactionsTable(views, pages, users) {

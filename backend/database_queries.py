@@ -92,6 +92,7 @@ def getFileStatistics(
         FROM DownloadHistory INNER JOIN Users
         ON DownloadHistory.UserID = Users.ID
         WHERE FileID = {fileID}
+        ORDER BY Timestamp DESC
     """).fetchall()
 
     columns = [*args] or (

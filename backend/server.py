@@ -151,7 +151,7 @@ def dashboard():
             app.logger.info(
                 f"Uploader '{username}' has successfully logged in."
             )
-            return render_template("uploadpage.html")
+            return render_template("uploadpage.html", host=config["host"], username=username)
 
         case Privilege.USER:
             app.logger.info(f"Viewer '{username}' has successfully logged in.")
@@ -308,19 +308,25 @@ def getFileStats():
     """ Api route to retrieve file download history."""
 
     privilege = Privilege(session.get("privilege"))
+    username = session.get("username")
+
     if not checkPrivilege(privilege, Privilege.USER):
         return createResp(Responses.PRIVILEGE_ERROR)
 
-    app.logger.debug(
-        f"File statistics for '{request.json["filename"]}' retrieved."
-    )
     filename = request.json.get("filename")
 
     if not filename:
+        app.logger.debug(
+            f"User {username} has requested for an empty file's download history."
+        )
         return createResp(Responses.EMPTY_NAME)
 
-    if not getFileData(db_conn, filename):
+
+    if not getFileData(db_conn, filename) and filename != "all":
         return createResp(Responses.FILE_NOT_EXISTS)
+
+    if filename == "all":
+        filename = ""
 
     return getFileStatistics(db_conn, filename)
 

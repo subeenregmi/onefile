@@ -1,8 +1,43 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="{{url_for('static', filename='scripts/upload.js')}}"></script>
+        <script>
+            window.onload = () => {
+                init("{{ host }}:5000")
+            }
+        </script>
+        <link rel="stylesheet" href="{{url_for('static', filename='styles/user.css')}}">
     </head>
     <body>
-        <h1> Uploaders page </h1>
+        <header>
+            <h1>Onefile
+                <a href="{{ "http://" + host + ":5000" }}">
+                    <button class="logout">Logout</button>
+                </a>
+            </h1>
+        </header>
+        <h2> Welcome <span>{{username}}</span> !</h2>
+        <h3> Shared files:</h2>
+        <div id="files">
+        </div>
+        <h3> Upload files </h3>
+        <div class="upload-file-form">
+            <form id="upload-file-form-id">
+                <div>
+                    <input type="text" name="filename" placeholder="filename" required>
+                </div>
+                <div>
+                    <input type="file" id="file-upload-input" required>
+                </div> 
+                <div>
+                    <input type="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+        <div class="response-bubble" id="response-bubble">
+            <p> Response Bubble!</p>
+        </div>
     </body>
 </html>
