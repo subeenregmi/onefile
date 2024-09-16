@@ -16,7 +16,8 @@ class OneFile {
 async function initialiseFiles(host) {
     let oneFilesList = [];
     try {
-        let files = await fetch(`http://${host}/${fileAPI}?cols=all`,
+        let files = await fetch(
+            `/${fileAPI}?cols=all`,
             {
                 method: "POST",
                 headers: {
@@ -32,16 +33,18 @@ async function initialiseFiles(host) {
             let file = files[i];
             let newFile = new OneFile(
                 file["FileName"],
-                await fetch(`http://${host}/${hashAPI}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        filename: file["FileName"] 
+                await fetch(
+                    `/${hashAPI}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            filename: file["FileName"] 
+                        }),
                     }),
-                }),
-                `http://${host}/${downloadFileAPI}/${file["FileName"]}`,
+                `/${downloadFileAPI}/${file["FileName"]}`,
                 file["DownloadCount"],
                 file["UploadDate"]
             )
@@ -65,7 +68,7 @@ function createIcon(host, file) {
     if (fileExtension == undefined) {
         fileExtension = "txt";
     }
-    image.src = `http://${host}/static/images/${fileExtension}_file_icon.png`;
+    image.src = `/static/images/${fileExtension}_file_icon.png`;
     paragraph.innerHTML = file.name;
     a.href = file.downloadLink;
 
@@ -151,7 +154,7 @@ async function uploadFile(host, form) {
     formData.append("file", file);
 
     let resp = await fetch(
-        `http://${host}/${uploadFileAPI}`,
+        `/${uploadFileAPI}`,
         {
             method: "POST",
             body: formData

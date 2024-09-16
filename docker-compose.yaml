@@ -1,0 +1,7 @@
+services:
+  onefile:
+    image: onefile
+    ports:
+      - "6868:5000"
+    restart: unless-stopped
+

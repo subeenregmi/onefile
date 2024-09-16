@@ -321,7 +321,6 @@ def getPageData(
      """).fetchall()
 
     columns = [*args] or getTableColumns("Pages")
-    print(columns, [*args], getTableColumns("Pages"))
     return [dict(zip(columns, page)) for page in pages]
 
 

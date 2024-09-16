@@ -411,7 +411,6 @@ def addUser():
 
     newPassHash = hashpw(newPassword, gensalt()).decode("UTF-8")
     newPrivilege = Privilege(request.json.get("privilege"))
-    print(request.json.get("privilege"))
 
     if newPrivilege is Privilege.UNKNOWN:
         return createResp(Responses.UNSPECIFIED_PRIVILEGE)
@@ -517,7 +516,7 @@ def getPageStats():
         return createResp(Responses.PARAMETER_ERROR)
 
     app.logger.info(f"User '{username}' has retrieved stats for the "
-                    "'{pageName}' page.")
+                    f"'{pageName or "all"}' page.")
     if pageID:
         pageID = pageID[0]["ID"]
 
@@ -551,7 +550,7 @@ def retrievePageData():
 
 
 def main():
-    app.debug = True
+    app.debug = config["debug"]
 
     # Add timed job to refresh files
     scheduler = APScheduler()

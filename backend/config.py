@@ -18,6 +18,8 @@ def getConfig(filename: str) -> dict[str, str]:
 
     data = checkSecret(data)
     data = checkHost(data)
+    data = checkRefreshFiles(data)
+    data = checkDebug(data)
 
     return data
 
@@ -67,5 +69,23 @@ def checkRefreshFiles(data: dict[str, str]) -> dict[str, str]:
 
     if "refresh_files" not in data or data["refresh_files"] is None:
         data["host"] = 300
+
+    return data
+
+
+def checkDebug(data: dict[str, str]) -> dict[str, str]:
+    """ Checks if debug is present in the config file, if
+    not will default to False
+
+    Args:
+        data: The current yaml file as a dictionary
+
+    Returns:
+        The 'data' dictionary with the debug value
+
+    """
+
+    if "debug" not in data or data["debug"] is None:
+        data["host"] = False
 
     return data

@@ -4,7 +4,7 @@ async function login(host, form) {
     let formData = new FormData(form);
     //console.log(formData);
     let req = await fetch(
-        `http://${host}:5000/${loginAPI}`,
+        `/${loginAPI}`,
         {
             method: 'POST',
             headers: {
@@ -17,7 +17,7 @@ async function login(host, form) {
         }
     )
     if (req.status == 200) {
-        window.location = `http://${host}:5000/dashboard`;
+        window.location = `/dashboard`;
     }
     else {
         let popup = document.getElementById("popup");

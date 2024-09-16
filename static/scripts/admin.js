@@ -147,7 +147,9 @@ function translatePrivilege(num){
 }
 
 async function deleteFile(host, fname) {
-    let resp = await fetch(`http://${host}/${deleteFileAPI}`, {
+    let resp = await fetch(
+    `/${deleteFileAPI}`, 
+    {
         method: "POST" ,
         headers: {
             "Content-Type": "application/json"
@@ -220,34 +222,40 @@ async function createUsersTable(host, users) {
 
 async function quickSummary(host) {
 
-    let files = await fetch(`http://${host}/${fileAPI}?cols=all`, {
-        method: "POST", 
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            filename: "all"
-        })
-    });
+    let files = await fetch(
+        `/${fileAPI}?cols=all`, 
+        {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filename: "all"
+            })
+        });
     files = await files.json();
 
     await createDownloadSummary(files);
     await createFilesTable(host, files);
 
-    let pageViews = await fetch(`http://${host}/${pageViewsAPI}?cols=all`, {
-        method: "POST", 
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            pagename: "all"
-        })
-    });
+    let pageViews = await fetch(
+        `/${pageViewsAPI}?cols=all`,
+        {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                pagename: "all"
+            })
+        });
     pageViews = await pageViews.json();
 
     await createPageViewStats(pageViews);
 
-    let users = await fetch(`http://${host}/${userAPI}?cols=all`, {
+    let users = await fetch(
+        `/${userAPI}?cols=all`, 
+        {
         method: "POST", 
         headers: {
             "Content-Type": "application/json"
@@ -262,7 +270,7 @@ async function quickSummary(host) {
     await createUsersTable(host, users);
 
     let pageViewTransactions = await fetch(
-        `http://${host}/${pageViewTransAPI}?order=desc`, 
+        `${pageViewTransAPI}?order=desc`, 
         {
             method: "POST",
             headers: {
@@ -271,8 +279,7 @@ async function quickSummary(host) {
             body: JSON.stringify({
                 pagename: "all"
             })
-        }
-    );
+        });
 
     pageViewTransactions = await pageViewTransactions.json();
 
@@ -280,7 +287,7 @@ async function quickSummary(host) {
     await createRecentViews(pageViewTransactions);
 
     let fileDLHistory = await fetch(
-        `http://${host}/${fileStatsAPI}`,
+        `/${fileStatsAPI}`,
         {
             method: "POST",
             headers: {
@@ -289,8 +296,7 @@ async function quickSummary(host) {
             body: JSON.stringify({
                 filename: "all"
             })
-        }
-    )
+        });
     fileDLHistory = await fileDLHistory.json();
     await createFileDownloadHistoryTable(fileDLHistory, files, users);
 }
@@ -375,7 +381,7 @@ async function createNewUser(host, form) {
     let formData = new FormData(form);
 
     let resp = await fetch (
-        `http://${host}/${addUserAPI}`,
+        `/${addUserAPI}`,
         {
             method: 'POST',
             headers: {
@@ -386,8 +392,7 @@ async function createNewUser(host, form) {
                 "password":`${formData.get("new-password")}`,
                 "privilege": Number(formData.get("new-privilege")),
             })
-        }
-    );
+        });
     let respj = await resp.json();
     await popup(respj);
 }
@@ -396,7 +401,7 @@ async function deleteUser(host, form) {
     let formData = new FormData(form);
 
     let resp = await fetch(
-        `http://${host}/${deleteUserAPI}`,
+        `/${deleteUserAPI}`,
         {
             method: "POST",
             headers: {
@@ -413,7 +418,7 @@ async function deleteUser(host, form) {
 
 async function deleteUserFromName(host, username) {
     let resp = await fetch(
-        `http://${host}/${deleteUserAPI}`,
+        `/${deleteUserAPI}`,
         {
             method: "POST",
             headers: {
@@ -434,7 +439,7 @@ async function uploadFile(host, form) {
     formData.append("file", file);
 
     let resp = await fetch(
-        `http://${host}/${uploadFileAPI}`,
+        `/${uploadFileAPI}`,
         {
             method: "POST",
             body: formData
